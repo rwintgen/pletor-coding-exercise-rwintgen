@@ -14,8 +14,8 @@ Implement quotas for image uploads in the backend:
 
 1. **Per-user quota:** Each user can only add up to 5 images per day.
 2. The `/images/` POST endpoint should enforce this quota.
-3. If a user exceeds their quota, return a 429 Too Many Requests error with a helpful message.
-4. Show the user's current quota usage in the frontend (e.g., "You have 2/5 uploads left today").
+3. If a user exceeds their quota, return the appropriate status code
+4. Show the user's current quota usage in the frontend
 5. **(Bonus)** Add a global rate limit: no more than 100 image uploads per day for all users combined.
 
 ---
@@ -24,9 +24,9 @@ Implement quotas for image uploads in the backend:
 
 Add user authentication and image ownership:
 
-1. Add endpoints for user registration and login (JWT-based authentication).
-2. Store users in the SQLite database (with hashed passwords).
-3. Associate each image with its owner (foreign key).
+1. Add endpoints for user registration and login
+2. Store users in the SQLite database
+3. Associate each image with its owner
 4. Only allow authenticated users to add/delete images.
 5. Only allow the owner of an image to delete it.
 6. Add an endpoint to get all images for the current user.
