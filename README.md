@@ -1,36 +1,48 @@
-# Fullstack FastAPI + Vite React Project
+# Image Upload Service Exercise
 
-This project is a template for a modern fullstack app using:
-- **Backend:** FastAPI (Python) with `uv` for dependency management and hot-reload
-- **Frontend:** Vite + React (JavaScript/TypeScript)
-- **Development:** Docker Compose for orchestration, with live reload for both frontend and backend
+## Context
+
+You've joined a team that inherited this image upload application. The product team has collected user feedback and identified several pain points:
+
+- *"I uploaded way too many images yesterday and now my storage is full"*
+- *"Some users are abusing the system and uploading hundreds of images"*
+- *"I can't tell how many more images I can upload today"*
+- *"There's no way to know if I'm close to hitting any limits"*
+
+The previous developer built a functional MVP, but it lacks the guardrails needed for a production environment.
+
+## Your Task (~1 hour)
+
+### Primary Exercise: Implement Upload Quotas
+
+Address the user feedback by implementing a quota system:
+
+1. **Per-user daily limit:** Each user can upload a maximum of 5 images per day
+2. **Global daily limit:** No more than 100 image uploads per day across all users
+3. **Quota enforcement:** The upload endpoint should reject requests that exceed either quota
+4. **User feedback:** Display clear quota information in the UI (current usage, remaining uploads)
+5. **Error handling:** Return appropriate error messages when limits are reached
+
+### Bonus: User Authentication & Ownership
+
+If time permits, add a more complete user management system:
+
+1. Add user registration and login endpoints
+2. Associate images with their owners
+3. Restrict image deletion to owners only
+4. Update the frontend to support authenticated sessions
+
+## What We're Evaluating
+
+- **Problem prioritization:** How you break down and tackle the requirements
+- **API design:** Clean, RESTful endpoints with proper status codes
+- **User experience:** Clear feedback and intuitive error messages
+- **Code quality:** Organization, readability, and maintainability
+- **Edge case handling:** What happens at boundaries and failure points
+
+We're more interested in your thought process and trade-off decisions than seeing everything completed. Feel free to leave TODOs or notes about what you would do with more time.
 
 ---
-
-
-## Coding Exercise: Implement Quotas (~1h)
-
-Implement quotas for image uploads in the backend:
-
-1. **Per-user quota:** Each user can only add up to 5 images per day.
-2. The `/images/` POST endpoint should enforce this quota.
-3. If a user exceeds their quota, return the appropriate status code
-4. Show the user's current quota usage in the frontend
-5. **(Bonus)** Add a global rate limit: no more than 100 image uploads per day for all users combined.
-
----
-
-## Bonus Exercise: User Authentication & Ownership
-
-Add user authentication and image ownership:
-
-1. Add endpoints for user registration and login
-2. Store users in the SQLite database
-3. Associate each image with its owner
-4. Only allow authenticated users to add/delete images.
-5. Only allow the owner of an image to delete it.
-6. Add an endpoint to get all images for the current user.
-7. Update the frontend to support login/logout and show only the user's images.
 
 ## Getting Started
 
