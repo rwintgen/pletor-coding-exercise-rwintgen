@@ -9,6 +9,10 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/requirements.txt
 
   frontend:
     build:
@@ -23,3 +27,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     command: npm run dev -- --host
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/package.json
