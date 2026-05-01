@@ -1,17 +1,12 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
-
-interface Image {
-  id: number
-  title: string
-  user: string
-  url: string
-  created_at: string
-  file_size: number | null
-  content_type: string | null
-}
-
-const API_URL = 'http://localhost:8000'
+import {
+  deleteImage,
+  getImageUrl,
+  Image,
+  listImages,
+  uploadImage,
+} from './api/client'
 
 function App() {
   const [images, setImages] = useState<Image[]>([])
@@ -26,11 +21,7 @@ function App() {
 
   const fetchImages = () => {
     setLoading(true)
-    fetch(`${API_URL}/images/`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch images')
-        return res.json()
-      })
+    listImages()
       .then(setImages)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
@@ -79,15 +70,7 @@ function App() {
       formData.append('file', selectedFile)
       formData.append('title', title)
       formData.append('user', user)
-
-      const res = await fetch(`${API_URL}/images/upload`, {
-        method: 'POST',
-        body: formData,
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.detail || 'Failed to upload image')
-      }
+      await uploadImage(formData)
       setTitle('')
       setUser('')
       setSelectedFile(null)
@@ -100,20 +83,14 @@ function App() {
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     setError(null)
     try {
-      const res = await fetch(`${API_URL}/images/${id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Failed to delete image')
+      await deleteImage(id)
       fetchImages()
     } catch (err: any) {
       setError(err.message)
     }
-  }
-
-  const getImageUrl = (url: string) => {
-    if (url.startsWith('http')) return url
-    return `${API_URL}${url}`
   }
 
   return (

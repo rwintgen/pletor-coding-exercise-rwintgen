@@ -1,63 +1,70 @@
 # Image Gallery Service
 
-## Context
+## Business Context
 
-You've joined a team that inherited this image gallery application. It was built as a quick MVP, images can be uploaded and displayed, but there's no authentication, no usage limits, and the gallery loads every image at once regardless of how many exist.
+You've joined PictoShare, a collaborative image gallery for creative teams: marketing agencies, design studios, content creators. An earlier contractor shipped an MVP; it works, but barely. Three pieces of user feedback have become blockers for an upcoming client demo:
 
-The database is pre-seeded with ~55 images across 5 users. Leadership wants this production-ready before onboarding more users. Your job is to add the missing pieces.
+- *"There are no accounts: anyone with the URL can upload to or delete from my team's gallery."*
+- *"One person uploaded a whole shoot and now nobody else on the team can upload today. We need fair limits across the team, not a free-for-all on a global cap."*
+- *"The gallery itself looks like a placeholder, empty states and grid display are subpar and we'd be embarrassed to put this in front of a client."*
+
+Your job: make this production-ready end-to-end. 
+
+Real auth and ownership, quotas that hold up under concurrent load and stay fair across users, and a gallery that feels good to actually use. The DB is pre-seeded with ~55 images across 5 users so you can see real data immediately.
 
 ## What's Already Built
 
-**Backend** (`backend/main.py` — FastAPI + SQLAlchemy + SQLite):
-- `POST /images/upload` — accepts a multipart file upload with `title` and `user` form fields. Saves the file to `uploads/` with a UUID filename.
-- `GET /images/` — returns all images, newest first. No pagination.
-- `GET /images/{id}` — returns a single image.
-- `DELETE /images/{id}` — deletes an image. No ownership check.
+**Backend** (`backend/app/`: FastAPI + SQLAlchemy + SQLite):
+- `POST /images/upload`: multipart upload with `title` and `user` form fields. Saves to `uploads/` with a UUID filename.
+- `GET /images/`: returns all images, newest first. No pagination.
+- `GET /images/{id}`: returns a single image.
+- `DELETE /images/{id}`: deletes an image. No ownership check.
 - Seeded images use Unsplash URLs; uploaded images are served from `/uploads/`.
 
-**Frontend** (`frontend/src/App.tsx` — React + Vite):
-- Single-file app with a drag-and-drop upload form (title + user + file).
-- Displays all images in a grid. No pagination, no auth, no progress indicator.
+**Frontend** (`frontend/src/`: React + Vite):
+- Drag-and-drop upload form (title + user + file).
+- Grid of all images. No pagination, no auth, no progress indicator.
 
-**Image model:** `id`, `created_at`, `title`, `user` (plain string), `url`, `file_size`, `content_type`.
-
-There is no authentication, no user model, and no upload limits.
+**Image model:** `id`, `created_at`, `title`, `user` (plain string), `url`, `file_size`, `content_type`. No user model, no upload limits.
 
 ---
 
-## Your Task (~1.5 hours)
+## Your Task (~1.5h)
 
-Complete the following in order of priority. We're more interested in your thought process and trade-off decisions than seeing everything completed. Feel free to leave TODOs or notes about what you would do with more time.
+If short on time, explain how you would have handled the missing topics.
 
-### 1. Authentication
+### 1. Authentication & Ownership
 
-Add user registration and login endpoints. Protect the upload and delete endpoints so only authenticated users can use them. Only the owner of an image should be able to delete it.
+Add user registration and login. Protect upload and delete so only authenticated users can use them. Only the owner of an image can delete it.
 
-You can use any auth approach (JWT, sessions, etc.)
+Ownership rules apply to every current and future endpoint that mutates an image, design accordingly.
 
 Update the frontend to support login/register and send credentials with API requests.
 
 ### 2. Upload Quotas
 
-Each authenticated user can upload a maximum of **10 images per day**. There is a global limit of **100 uploads per day** across all users.
+Each authenticated user can upload **10 images per day**. There is a global limit of **100 uploads per day** across all users.
 
-- The API should return clear error responses when limits are hit
-- The UI should show the user how many uploads they have remaining today
+- Return clear error responses when limits are hit
+- The user should always know where they stand on quota approaching the limit, hitting it, and recovering after reset.
 
-### 3. Pagination
+Make sure to account for potential race conditions.
 
-The `GET /images/` endpoint currently returns all images at once. Add limit/offset pagination to the API. Update the frontend to paginate the gallery. The database has 55+ images to verify this works.
+### 3. Polished gallery
 
-### 4. Upload Progress
+The gallery is functional but visually subpar: a uniform grid that crops every image to the same box regardless of its real aspect ratio, ugly empty states, deletes flash the whole grid, every interaction is a hard cut.
 
-Show upload progress in the UI when a user uploads a file. The current implementation gives no feedback between clicking "Upload" and completion.
+Make the gallery itself feel like a real product. We're especially interested in:
 
-### 5. Write a Test
+- A layout that respects the images: masonry, justified rows, or another approach that handles varying aspect ratios well instead of cropping everything to a square
+- Hover micro-interactions: metadata reveal, gentle zoom or fade, action affordances that surface on intent
+- Empty / loading / error states
+- Interaction feedback: what happens during and after an upload, a delete, a login
 
-Write at least one backend test for the quota logic. `pytest`, `pytest-asyncio`, and `httpx` are available. We want to see how you think about testing, not full coverage.
+You don't need to fix everything, focus on what you deem most important and detail what you would have done for the others given more time.
+
 
 ### Bonus (if time permits)
-
 - Batch upload (multiple files at once)
 - Image search or filtering
 - Any other improvements you think matter
@@ -66,21 +73,17 @@ Write at least one backend test for the quota logic. `pytest`, `pytest-asyncio`,
 
 ## What We're Evaluating
 
-- **Architecture decisions:** How you structure auth, where you put quota logic, how you design the pagination API
-- **API design:** Proper status codes, clear error messages, RESTful conventions
-- **Frontend quality:** Component structure, state management, user experience
-- **Testing approach:** What you choose to test and why
-- **Trade-off communication:** TODOs and comments about what you'd improve with more time
-
-**Note:** The existing codebase is intentionally kept simple. Any improvement you make to the existing code (structure, patterns, error handling, types, etc.) is appreciated and will be taken into account.
-
-**Important:** Partial implementations with clear explanations are better than rushed complete ones.
+- **Architecture**: auth dependency reuse, router/service split, real users table vs the seeded string field
+- **Correctness**: concurrency, ownership, CORS + credentials interaction
+- **Frontend craft**: visual hierarchy, designed states, interaction feedback, accessibility, *what you chose to fix first*
+- **Communication**: assumptions and tradeoffs documented
 
 ## Ground Rules
 
-- You can install any library you want (backend or frontend)
-- You can modify any file in the project, including configuration, structure, and existing code
-- If you change something that already existed, briefly explain why
+- Install any library you want
+- Modify any file, including existing code
+- If you change existing behavior, briefly say why
+- Use AI tooling as much as you want
 
 ---
 
@@ -88,9 +91,9 @@ Write at least one backend test for the quota logic. `pytest`, `pytest-asyncio`,
 
 ### Prerequisites
 - [Docker](https://www.docker.com/get-started)
-- [Docker Compose v2.17+](https://docs.docker.com/compose/compose-v2/) (for `docker compose watch`)
+- [Docker Compose v2.17+](https://docs.docker.com/compose/compose-v2/)
 
-### Running the Project
+### Running
 
 From the project root:
 
@@ -98,28 +101,45 @@ From the project root:
 docker compose up --build
 ```
 
-Or, for live reload on file changes (recommended):
+Or with live reload:
 
 ```bash
 docker compose watch
 ```
 
-### Accessing the Apps
+### Apps
 
-- **Backend (FastAPI):** [http://localhost:8000](http://localhost:8000)
-- **API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Frontend (Vite + React):** [http://localhost:5173](http://localhost:5173)
+- **Backend (FastAPI):** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
+- **Frontend (Vite + React):** http://localhost:5173
+
 
 ## Project Structure
 
 ```
-backend/    # FastAPI app (Python)
-frontend/   # Vite + React app (TypeScript)
+backend/
+  app/
+    main.py            # FastAPI app + lifespan
+    db.py              # engine, session, Base, get_db
+    models.py          # SQLAlchemy models
+    schemas.py         # Pydantic schemas
+    seed.py            # idempotent seed data
+    routers/
+      images.py
+  tests/
+    conftest.py        # async client + isolated DB fixtures
+    test_example.py
+frontend/
+  src/
+    api/client.ts      # fetch wrapper
+    components/        # extend here
+    hooks/             # extend here
+    App.tsx
 docker-compose.yml
 ```
 
-### Development Notes
+### Notes
 
-- **Backend:** Hot reload via `uvicorn --reload`. Edit `backend/` and changes reflect automatically.
-- **Frontend:** Hot reload via Vite. Edit `frontend/src/` and changes reflect automatically.
+- **Backend:** Hot reload via `uvicorn --reload`. Edit `backend/app/` and changes reflect.
+- **Frontend:** Hot reload via Vite. Edit `frontend/src/` and changes reflect.
 - **Database:** SQLite at `backend/test.db`. Delete it to reset and re-seed.
