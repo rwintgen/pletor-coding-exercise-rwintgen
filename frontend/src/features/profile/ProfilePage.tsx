@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { Fab } from '../../components/Fab'
 import { ImageCard } from '../../components/ImageCard'
+import { MasonryGrid } from '../../components/MasonryGrid'
 import { Modal } from '../../components/Modal'
 import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
@@ -76,6 +77,7 @@ export function ProfilePage() {
         margin: '0 auto',
         padding: `${spacing['2xl']} ${spacing.xl}`,
         fontFamily: typography.fontFamily,
+        minHeight: '100vh',
       }}
     >
       <header
@@ -90,7 +92,7 @@ export function ProfilePage() {
           style={{
             width: 64,
             height: 64,
-            borderRadius: radii.full,
+            borderRadius: radii.lg,
             background: gradients.brand,
             color: colors.neutral[0],
             display: 'flex',
@@ -138,7 +140,7 @@ export function ProfilePage() {
           <Spinner size={36} />
         </div>
       ) : images && images.length > 0 ? (
-        <div className="masonry stagger-fade">
+        <MasonryGrid>
           {images.map((img) => (
             <ImageCard
               key={img.id}
@@ -147,7 +149,7 @@ export function ProfilePage() {
               onDelete={isOwnProfile ? handleDelete : undefined}
             />
           ))}
-        </div>
+        </MasonryGrid>
       ) : (
         <EmptyState
           icon="🖼️"

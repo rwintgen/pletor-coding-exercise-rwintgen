@@ -40,16 +40,29 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
         <div style={{ fontFamily: typography.fontFamily }}>
           <div
             style={{
-              background: colors.neutral[950],
+              position: 'relative',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              overflow: 'hidden',
             }}
           >
+            {/* Blurred background fill — visible behind portrait/narrow images */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: -20,
+                backgroundImage: `url(${getImageUrl(image.url)})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(30px) brightness(0.6)',
+              }}
+            />
             <img
               src={getImageUrl(image.url)}
               alt={image.title}
               style={{
+                position: 'relative',
                 width: '100%',
                 maxHeight: '70vh',
                 objectFit: 'contain',

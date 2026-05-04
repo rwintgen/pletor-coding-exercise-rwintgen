@@ -7,6 +7,7 @@ import { RegisterPage } from './features/auth/RegisterPage'
 import { GalleryPage } from './features/gallery/GalleryPage'
 import { ProfilePage } from './features/profile/ProfilePage'
 import { useAuthStore } from './stores/auth'
+import { applyTheme, useThemeStore } from './stores/theme'
 
 /**
  * Root component. Sets up routing and re-validates the persisted token
@@ -14,6 +15,11 @@ import { useAuthStore } from './stores/auth'
  */
 export default function App() {
   const { token, user, setUser, clear } = useAuthStore()
+  const themeMode = useThemeStore((s) => s.mode)
+
+  useEffect(() => {
+    applyTheme(themeMode)
+  }, [themeMode])
 
   useEffect(() => {
     if (token && !user) {

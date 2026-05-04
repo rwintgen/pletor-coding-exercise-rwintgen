@@ -35,7 +35,7 @@ export const colors = {
   },
   success: { 50: '#ecfdf5', 500: '#10b981', 700: '#047857' },
   warning: { 50: '#fffbeb', 500: '#f59e0b', 700: '#b45309' },
-  error: { 50: '#fef2f2', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' },
+  error: { 50: 'var(--error-50)', 500: 'var(--error-500)', 600: 'var(--error-600)', 700: 'var(--error-700)' },
 } as const
 
 export const gradients = {

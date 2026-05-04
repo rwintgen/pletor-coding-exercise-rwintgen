@@ -7,6 +7,7 @@ import { ErrorBanner } from '../../components/ErrorBanner'
 import { Fab } from '../../components/Fab'
 import { GalleryToolbar } from '../../components/GalleryToolbar'
 import { ImageCard } from '../../components/ImageCard'
+import { MasonryGrid } from '../../components/MasonryGrid'
 import { Modal } from '../../components/Modal'
 import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
@@ -49,6 +50,7 @@ export function GalleryPage() {
         margin: '0 auto',
         padding: `${spacing['2xl']} ${spacing.xl}`,
         fontFamily: typography.fontFamily,
+        minHeight: '100vh',
       }}
     >
       <header style={{ textAlign: 'center', marginBottom: spacing['3xl'] }}>
@@ -93,9 +95,7 @@ export function GalleryPage() {
         </div>
       ) : images && images.length > 0 ? (
         <>
-          <div
-            className="masonry stagger-fade"
-          >
+          <MasonryGrid>
             {images.map((img) => (
               <ImageCard
                 key={img.id}
@@ -104,7 +104,7 @@ export function GalleryPage() {
                 onDelete={token ? handleDelete : undefined}
               />
             ))}
-          </div>
+          </MasonryGrid>
           {hasNextPage && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing['2xl'] }}>
               <Button

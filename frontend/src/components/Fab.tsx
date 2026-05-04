@@ -28,7 +28,7 @@ export function Fab({ onClick, label = 'Upload image' }: FabProps) {
         right: 32,
         width: 60,
         height: 60,
-        borderRadius: radii.lg,
+        borderRadius: radii.xl,
         background: gradients.brand,
         color: colors.neutral[0],
         border: 'none',

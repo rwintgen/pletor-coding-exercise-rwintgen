@@ -207,3 +207,11 @@ Result targets the 8.5/10 ceiling identified in the audit: env-driven config, fi
 - **Optimistic title update**: `ImageDetail` now tracks a `localTitle` state that updates instantly on save; syncs back from the `image` prop via `useEffect` when query refetches.
 - **Navbar floating pill**: changed from full-bleed `borderBottom` bar to a floating pill with rounded corners (`radii.xl`), `top: spacing.sm` offset and `margin: 0 spacing.sm` so page content peeks above and on the sides.
 - **Profile link hover**: the avatar + username `<Link>` now has padding + `borderRadius: radii.lg` and a subtle `colors.neutral[100]` background on hover, matching the ghost button feel of "Sign out".
+
+### Masonry L→R fix, theme toggle, UI polish
+- **Masonry reading order fix**: replaced CSS `column-count` masonry (which fills top-to-bottom per column) with a JS flex-column approach (`MasonryGrid` component). Images are distributed round-robin into N vertical flex columns (`item[i] → column[i % cols]`), ensuring left-to-right reading order. Responsive via `matchMedia` listeners matching the same breakpoints. Applied to both `GalleryPage` and `ProfilePage`; old `.masonry` CSS rules removed.
+- **Theme toggle**: new Zustand store (`stores/theme.ts`) with `system | light | dark` modes, persisted to localStorage. Navbar shows a cycle button (computer → sun → moon SVG icons). CSS updated: `prefers-color-scheme: dark` now respects `data-theme` attribute override — `[data-theme="light"]` forces light, `[data-theme="dark"]` forces dark, no attribute = system default.
+- **Danger zone dark mode**: error color tokens (`error.50/500/600/700`) converted from hard-coded hex to CSS variables with dark-mode variants (muted red background, lighter text).
+- **Blurred lightbox background**: portrait/narrow images in the `ImageDetail` modal now show a blurred + dimmed version of the same image as background (`filter: blur(30px) brightness(0.6)`) instead of flat black/white bands.
+- **UI tweaks**: FAB corners rounder (`radii.lg` → `radii.xl`), profile avatar changed from circle to rounded square (`radii.full` → `radii.lg`), EmptyState emoji background same change.
+- **Full-height pages**: added `minHeight: '100vh'` to `GalleryPage` and `ProfilePage` so the body radial gradient always reaches the viewport bottom.
