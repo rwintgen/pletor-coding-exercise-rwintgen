@@ -29,7 +29,8 @@ export function GalleryPage() {
     [search, sort],
   )
 
-  const { data: images, isLoading, error } = useImages(params)
+  const { data, isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = useImages(params)
+  const images = data?.pages.flat()
   const deleteMutation = useDeleteImage()
 
   const handleDelete = (image: Image) => {
@@ -83,22 +84,44 @@ export function GalleryPage() {
           <Spinner size={32} />
         </div>
       ) : images && images.length > 0 ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: spacing.xl,
-          }}
-        >
-          {images.map((img) => (
-            <ImageCard
-              key={img.id}
-              image={img}
-              onClick={setActive}
-              onDelete={token ? handleDelete : undefined}
-            />
-          ))}
-        </div>
+        <>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+              gap: spacing.xl,
+            }}
+          >
+            {images.map((img) => (
+              <ImageCard
+                key={img.id}
+                image={img}
+                onClick={setActive}
+                onDelete={token ? handleDelete : undefined}
+              />
+            ))}
+          </div>
+          {hasNextPage && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing.xl }}>
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                style={{
+                  padding: `${spacing.sm} ${spacing.xl}`,
+                  borderRadius: radii.md,
+                  border: `1px solid ${colors.neutral[300]}`,
+                  background: colors.neutral[0],
+                  fontSize: typography.fontSize.sm,
+                  fontFamily: typography.fontFamily,
+                  cursor: isFetchingNextPage ? 'not-allowed' : 'pointer',
+                  color: colors.neutral[700],
+                }}
+              >
+                {isFetchingNextPage ? 'Loading...' : 'Load more'}
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <EmptyState
           title="No images yet"

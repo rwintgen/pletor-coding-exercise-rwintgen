@@ -1,11 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { deleteImage, getUserImages, ListImagesParams, listImages, uploadImage } from '../api/client'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { deleteImage, getUserImages, ListImagesParams, listImages, PAGE_SIZE, uploadImage } from '../api/client'
 
-/** Fetches all images with optional search/filter/sort. */
+/** Fetches images with infinite scroll (load more) pagination. */
 export function useImages(params?: ListImagesParams) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['images', params],
-    queryFn: () => listImages(params),
+    queryFn: ({ pageParam = 0 }) => listImages(params, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      lastPage.length === PAGE_SIZE ? lastPageParam + PAGE_SIZE : undefined,
   })
 }
 

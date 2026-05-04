@@ -48,6 +48,8 @@ function authHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+export const PAGE_SIZE = 50
+
 /** Options for listing images (search, filter, sort). */
 export interface ListImagesParams {
   search?: string
@@ -55,12 +57,14 @@ export interface ListImagesParams {
   sort?: 'newest' | 'oldest' | 'title'
 }
 
-/** Fetches images with optional search/filter/sort. */
-export async function listImages(params?: ListImagesParams): Promise<Image[]> {
+/** Fetches images with optional search/filter/sort and pagination. */
+export async function listImages(params?: ListImagesParams, offset = 0): Promise<Image[]> {
   const url = new URL(`${API_URL}/images/`)
   if (params?.search) url.searchParams.set('search', params.search)
   if (params?.user) url.searchParams.set('user', params.user)
   if (params?.sort) url.searchParams.set('sort', params.sort)
+  url.searchParams.set('limit', String(PAGE_SIZE))
+  url.searchParams.set('offset', String(offset))
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error('Failed to fetch images')
   return res.json()
