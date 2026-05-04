@@ -77,6 +77,8 @@ async def list_images(
     search: Optional[str] = Query(None, description="Search by title"),
     user: Optional[str] = Query(None, description="Filter by username"),
     sort: Optional[str] = Query("newest", description="Sort: newest, oldest, title"),
+    limit: int = Query(50, ge=1, le=200, description="Page size"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
 ):
     stmt = select(Image, User.username).join(User, Image.user_id == User.id)
 
@@ -92,6 +94,7 @@ async def list_images(
     else:
         stmt = stmt.order_by(Image.created_at.desc())
 
+    stmt = stmt.limit(limit).offset(offset)
     result = await db.execute(stmt)
     return [_image_to_response(row.Image, row.username) for row in result.all()]
 

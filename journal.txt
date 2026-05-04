@@ -106,3 +106,15 @@
 - 11 new backend tests (search, case-insensitive, filter by user, sort oldest, sort title, no results, user profile, user not found, user images, empty, not found)
 - Total: 42 tests, all passing
 - Docs updated: API table, routing table, component list
+- Commit: `8e38860` — feat: search/sort toolbar, user profiles, username links + 11 new tests
+
+### Bug fixes + polish
+- **Profile routing**: replaced `<Link>` with `useNavigate()` for username clicks in both ImageCard and ImageDetail — prevents event being swallowed by Card/Modal ancestors. Lightbox `onClose` fires before navigate.
+- **Username hover**: added underline on hover for all username links.
+- **theme.ts trimmed**: removed ~60% of unused tokens (neutral 400, primary 100–400/700–900, success 50/700, warning 50/700, radii.sm, shadows.lg, transitions.slow, typography.lineHeight, typography.fontWeight.normal, spacing.4xl, fontSize.2xl—only used where needed).
+- **Toolbar redesign**: added filter-by-user dropdown alongside sort; custom chevron arrow SVG on selects; consistent padding and alignment.
+- **Upload UX**: removed sidebar panel, replaced with FAB (floating "+" button, bottom-right) that opens a modal overlay with the upload form.
+- **Broken images**: seed URLs now include `?w=800&fit=crop&auto=format` for reliable Unsplash delivery.
+- **Scalability**: added DB indexes on `title`, `created_at`, `user_id`; added `limit`/`offset` pagination to `GET /images/` (default 50, max 200). Documented next steps for millions of images (full-text search, cursor pagination, CDN, read replicas).
+- 1 new test: `test_pagination_limit_offset`
+- Total: 43 tests, all passing

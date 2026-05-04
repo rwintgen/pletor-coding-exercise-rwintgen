@@ -5,14 +5,36 @@ interface GalleryToolbarProps {
   onSearchChange: (value: string) => void
   sort: string
   onSortChange: (value: string) => void
+  filterUser: string
+  onFilterUserChange: (value: string) => void
+  users: string[]
 }
 
-/** Search bar + sort dropdown for the gallery grid. */
+const selectStyle = {
+  padding: `${spacing.sm} ${spacing.lg}`,
+  paddingRight: '32px',
+  borderRadius: radii.md,
+  border: `1px solid ${colors.neutral[300]}`,
+  fontSize: typography.fontSize.sm,
+  fontFamily: typography.fontFamily,
+  background: colors.neutral[0],
+  color: colors.neutral[700],
+  cursor: 'pointer',
+  appearance: 'none' as const,
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23525252' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 10px center',
+}
+
+/** Search bar + sort/filter dropdowns for the gallery. */
 export function GalleryToolbar({
   search,
   onSearchChange,
   sort,
   onSortChange,
+  filterUser,
+  onFilterUserChange,
+  users,
 }: GalleryToolbarProps) {
   return (
     <div
@@ -21,6 +43,7 @@ export function GalleryToolbar({
         gap: spacing.md,
         marginBottom: spacing.xl,
         flexWrap: 'wrap',
+        alignItems: 'center',
         fontFamily: typography.fontFamily,
       }}
     >
@@ -32,7 +55,7 @@ export function GalleryToolbar({
         style={{
           flex: 1,
           minWidth: 200,
-          padding: spacing.sm,
+          padding: `${spacing.sm} ${spacing.md}`,
           borderRadius: radii.md,
           border: `1px solid ${colors.neutral[300]}`,
           fontSize: typography.fontSize.sm,
@@ -40,23 +63,20 @@ export function GalleryToolbar({
           outline: 'none',
         }}
       />
-      <select
-        value={sort}
-        onChange={(e) => onSortChange(e.target.value)}
-        style={{
-          padding: `${spacing.sm} ${spacing.lg}`,
-          borderRadius: radii.md,
-          border: `1px solid ${colors.neutral[300]}`,
-          fontSize: typography.fontSize.sm,
-          fontFamily: typography.fontFamily,
-          background: colors.neutral[0],
-          color: colors.neutral[700],
-          cursor: 'pointer',
-        }}
-      >
-        <option value="newest">Newest first</option>
-        <option value="oldest">Oldest first</option>
-        <option value="title">Title A–Z</option>
+
+      <select value={sort} onChange={(e) => onSortChange(e.target.value)} style={selectStyle}>
+        <option value="newest">Sort: Newest</option>
+        <option value="oldest">Sort: Oldest</option>
+        <option value="title">Sort: Title A–Z</option>
+      </select>
+
+      <select value={filterUser} onChange={(e) => onFilterUserChange(e.target.value)} style={selectStyle}>
+        <option value="">Filter: All users</option>
+        {users.map((u) => (
+          <option key={u} value={u}>
+            Filter: {u}
+          </option>
+        ))}
       </select>
     </div>
   )

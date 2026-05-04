@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Image, getImageUrl } from '../../api/client'
 import { Modal } from '../../components/Modal'
 import { colors, spacing, typography } from '../../theme'
@@ -10,6 +10,14 @@ interface ImageDetailProps {
 
 /** Lightbox modal that displays the full-size image with metadata. */
 export function ImageDetail({ image, onClose }: ImageDetailProps) {
+  const navigate = useNavigate()
+
+  const goToProfile = () => {
+    if (!image) return
+    onClose()
+    navigate(`/user/${image.username}`)
+  }
+
   return (
     <Modal open={!!image} onClose={onClose} maxWidth={960}>
       {image && (
@@ -47,7 +55,7 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
               }}
             >
               <span>
-                by <Link to={`/user/${image.username}`} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none' }}>{image.username}</Link>
+                by <a onClick={goToProfile} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline' }} onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none' }}>{image.username}</a>
               </span>
               <span>{new Date(image.created_at).toLocaleString()}</span>
               {image.file_size && <span>{(image.file_size / 1024).toFixed(1)} KB</span>}

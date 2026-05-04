@@ -7,10 +7,14 @@ import { Input } from '../../components/ui/Input'
 import { useUploadImage } from '../../hooks/useImages'
 import { useQuota } from '../../hooks/useQuota'
 import { uploadSchema } from '../../lib/schemas'
-import { colors, radii, shadows, spacing, typography } from '../../theme'
+import { colors, spacing, typography } from '../../theme'
+
+interface UploadFormProps {
+  onSuccess?: () => void
+}
 
 /** Upload form panel — title input, drop zone, submit, quota indicator. */
-export function UploadForm() {
+export function UploadForm({ onSuccess }: UploadFormProps) {
   const [title, setTitle] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -41,6 +45,7 @@ export function UploadForm() {
       await upload.mutateAsync(form)
       setTitle('')
       setFile(null)
+      onSuccess?.()
     } catch (err: any) {
       setError(err.message)
     }
@@ -50,11 +55,6 @@ export function UploadForm() {
     <form
       onSubmit={handleSubmit}
       style={{
-        background: colors.neutral[0],
-        border: `1px solid ${colors.neutral[200]}`,
-        borderRadius: radii.xl,
-        padding: spacing.xl,
-        boxShadow: shadows.sm,
         display: 'flex',
         flexDirection: 'column',
         gap: spacing.lg,

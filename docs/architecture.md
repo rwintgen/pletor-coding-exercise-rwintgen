@@ -36,6 +36,14 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 | search | string | Case-insensitive title search (ILIKE) |
 | user | string | Filter by exact username |
 | sort | string | `newest` (default), `oldest`, or `title` |
+| limit | int | Page size, 1–200 (default 50) |
+| offset | int | Pagination offset (default 0) |
+
+### Scalability notes
+
+- DB indexes on `images.title`, `images.created_at`, `images.user_id` for fast queries.
+- Pagination via `limit`/`offset` prevents unbounded result sets.
+- For millions of images, next steps: full-text search engine (Postgres `tsvector` or Meilisearch), cursor-based pagination, CDN for images, read replicas.
 
 ## Auth Flow
 

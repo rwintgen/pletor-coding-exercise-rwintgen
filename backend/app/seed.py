@@ -157,7 +157,7 @@ async def seed_if_empty(db: AsyncSession) -> None:
                 Image(
                     title=TITLES[idx],
                     user_id=user_objects[user_idx].id,
-                    url=f"https://images.unsplash.com/{UNSPLASH_IDS[idx]}",
+                    url=f"https://images.unsplash.com/{UNSPLASH_IDS[idx]}?w=800&fit=crop&auto=format",
                     created_at=ts,
                 )
             )

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Image, getImageUrl } from '../api/client'
 import { useAuthStore } from '../stores/auth'
 import { colors, radii, spacing, typography } from '../theme'
@@ -14,6 +14,7 @@ interface ImageCardProps {
 export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
   const currentUser = useAuthStore((s) => s.user)
   const isOwner = currentUser?.id === image.user_id
+  const navigate = useNavigate()
 
   return (
     <Card interactive={!!onClick} onClick={onClick ? () => onClick(image) : undefined}>
@@ -104,7 +105,7 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
             color: colors.neutral[500],
           }}
         >
-          <span>by <Link to={`/user/${image.username}`} onClick={(e) => e.stopPropagation()} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none' }}>{image.username}</Link></span>
+          <span>by <a onClick={(e) => { e.stopPropagation(); navigate(`/user/${image.username}`) }} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline' }} onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none' }}>{image.username}</a></span>
           <span>{new Date(image.created_at).toLocaleDateString()}</span>
         </div>
       </div>
