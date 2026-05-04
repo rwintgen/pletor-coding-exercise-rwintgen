@@ -16,4 +16,32 @@
 - Used Ruff for backend formatting as it's the modern standard for Python (fast, replaces black + isort + flake8)
 
 ### Commits
-- (none yet — awaiting instruction to commit)
+- `0d41ddc` — chore: scaffold project structure, theme, tooling, and docs
+- `524cf7e` — fix: format script uses docker for backend, fix python init file and format all code
+
+---
+
+## Session 1 — Task Log
+
+### Task: Fix format.sh frontend deps (no commit — user said skip journal)
+- ESLint couldn't run because node_modules weren't installed
+- Added `npm install` before `npx eslint`
+- Tried pip for backend but macOS blocks system Python installs
+- Settled on graceful fallback message pointing to Docker
+
+### Task: Disconnect git remote, connect new repo
+- Removed origin pointing to `Lasqo/pletor-coding-exercise`
+- Added new origin: `rwintgen/pletor-coding-exercise-rwintgen`
+- Added conventional commit prefix rule to copilot-instructions.md
+- Committed and pushed all scaffolding work
+
+### Task: Start app with Docker
+- Docker Desktop wasn't running — launched it with `open -a Docker`
+- `docker compose up --build` hit `no such column: images.file_size` because old test.db lacked new columns
+- Fixed by adding `drop_all` before `create_all` in lifespan handler (dev-only approach, DB is re-seeded anyway)
+- Hot-reload picked up the fix, app started successfully
+
+### Task: Fix format.sh for backend
+- `services/__init__.py` had TypeScript `export {}` — replaced with empty file
+- Rewrote format.sh to use `docker compose exec backend ruff` (requires running containers)
+- Ran formatter, all files clean, committed and pushed
