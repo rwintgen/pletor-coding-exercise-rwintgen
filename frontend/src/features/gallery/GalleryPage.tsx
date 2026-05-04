@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Image, ListImagesParams } from '../../api/client'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { Fab } from '../../components/Fab'
@@ -22,6 +23,7 @@ export function GalleryPage() {
   const [sort, setSort] = useState('newest')
   const [active, setActive] = useState<Image | null>(null)
   const [showUpload, setShowUpload] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Image | null>(null)
 
   const params: ListImagesParams = useMemo(
     () => ({
@@ -36,8 +38,7 @@ export function GalleryPage() {
   const deleteMutation = useDeleteImage()
 
   const handleDelete = (image: Image) => {
-    if (!confirm(`Delete "${image.title}"?`)) return
-    deleteMutation.mutate(image.id)
+    setDeleteTarget(image)
   }
 
   return (
@@ -150,6 +151,19 @@ export function GalleryPage() {
       </Modal>
 
       <ImageDetail image={active} onClose={() => setActive(null)} />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete image"
+        description={deleteTarget ? `Are you sure you want to delete "${deleteTarget.title}"? This cannot be undone.` : ''}
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

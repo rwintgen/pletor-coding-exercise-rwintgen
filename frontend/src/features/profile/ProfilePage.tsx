@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Image } from '../../api/client'
 import { deleteAccount, getUserProfile } from '../../api/client'
+import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { Fab } from '../../components/Fab'
@@ -27,7 +28,10 @@ export function ProfilePage() {
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Image | null>(null)
+  const [showAccountDelete, setShowAccountDelete] = useState(false)
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const {
     data: profile,
@@ -43,8 +47,7 @@ export function ProfilePage() {
   const deleteMutation = useDeleteImage()
 
   const handleDelete = (image: Image) => {
-    if (!confirm(`Delete "${image.title}"?`)) return
-    deleteMutation.mutate(image.id)
+    setDeleteTarget(image)
   }
 
   if (profileLoading) {
@@ -201,18 +204,7 @@ export function ProfilePage() {
           <Button
             variant="danger"
             disabled={deleting}
-            onClick={async () => {
-              setDeleting(true)
-              setDeleteError(null)
-              try {
-                await deleteAccount()
-                clear()
-                navigate('/')
-              } catch (err) {
-                setDeleteError(errorMessage(err))
-                setDeleting(false)
-              }
-            }}
+            onClick={() => setShowAccountDelete(true)}
           >
             {deleting ? 'Deleting account…' : 'Delete my account'}
           </Button>
@@ -223,6 +215,44 @@ export function ProfilePage() {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete image"
+        description={deleteTarget ? `Are you sure you want to delete "${deleteTarget.title}"? This cannot be undone.` : ''}
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={showAccountDelete}
+        title="Delete your account?"
+        description="This will permanently delete your account and all your uploaded images. This action cannot be undone."
+        confirmLabel="Delete my account"
+        variant="danger"
+        loading={deleting}
+        onConfirm={async () => {
+          setDeleting(true)
+          setDeleteError(null)
+          try {
+            await deleteAccount()
+            queryClient.removeQueries({ queryKey: ['images'] })
+            queryClient.removeQueries({ queryKey: ['user', username] })
+            clear()
+            navigate('/')
+          } catch (err) {
+            setDeleteError(errorMessage(err))
+            setDeleting(false)
+            setShowAccountDelete(false)
+          }
+        }}
+        onCancel={() => setShowAccountDelete(false)}
+      />
     </div>
   )
 }

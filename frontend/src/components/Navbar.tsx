@@ -80,7 +80,9 @@ export function Navbar() {
                   transition: `color ${transitions.fast}`,
                 }}
               >
-                <strong style={{ color: colors.neutral[900] }}>{user.username}</strong>
+                <strong style={{ color: colors.neutral[900] }}>
+                  {user.username.length > 15 ? `${user.username.slice(0, 15)}…` : user.username}
+                </strong>
               </span>
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
