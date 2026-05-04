@@ -48,10 +48,35 @@ function authHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-/** Fetches all images (newest first) */
-export async function listImages(): Promise<Image[]> {
-  const res = await fetch(`${API_URL}/images/`)
+/** Options for listing images (search, filter, sort). */
+export interface ListImagesParams {
+  search?: string
+  user?: string
+  sort?: 'newest' | 'oldest' | 'title'
+}
+
+/** Fetches images with optional search/filter/sort. */
+export async function listImages(params?: ListImagesParams): Promise<Image[]> {
+  const url = new URL(`${API_URL}/images/`)
+  if (params?.search) url.searchParams.set('search', params.search)
+  if (params?.user) url.searchParams.set('user', params.user)
+  if (params?.sort) url.searchParams.set('sort', params.sort)
+  const res = await fetch(url.toString())
   if (!res.ok) throw new Error('Failed to fetch images')
+  return res.json()
+}
+
+/** Fetches a user's public profile. */
+export async function getUserProfile(username: string): Promise<UserInfo> {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(username)}`)
+  if (!res.ok) throw new Error('User not found')
+  return res.json()
+}
+
+/** Fetches all images uploaded by a specific user. */
+export async function getUserImages(username: string): Promise<Image[]> {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(username)}/images`)
+  if (!res.ok) throw new Error('Failed to fetch user images')
   return res.json()
 }
 

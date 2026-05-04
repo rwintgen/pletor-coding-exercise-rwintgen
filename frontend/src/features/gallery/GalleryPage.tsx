@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { Image } from '../../api/client'
+import type { Image, ListImagesParams } from '../../api/client'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
+import { GalleryToolbar } from '../../components/GalleryToolbar'
 import { ImageCard } from '../../components/ImageCard'
 import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useImages } from '../../hooks/useImages'
@@ -11,12 +12,23 @@ import { colors, spacing, typography } from '../../theme'
 import { ImageDetail } from './ImageDetail'
 import { UploadForm } from './UploadForm'
 
-/** Main gallery page: header, optional upload form (auth), and image grid. */
+/** Main gallery page: header, search/sort toolbar, optional upload form, and image grid. */
 export function GalleryPage() {
   const token = useAuthStore((s) => s.token)
-  const { data: images, isLoading, error } = useImages()
-  const deleteMutation = useDeleteImage()
+  const [search, setSearch] = useState('')
+  const [sort, setSort] = useState('newest')
   const [active, setActive] = useState<Image | null>(null)
+
+  const params: ListImagesParams = useMemo(
+    () => ({
+      search: search || undefined,
+      sort: sort as ListImagesParams['sort'],
+    }),
+    [search, sort],
+  )
+
+  const { data: images, isLoading, error } = useImages(params)
+  const deleteMutation = useDeleteImage()
 
   const handleDelete = (image: Image) => {
     if (!confirm(`Delete "${image.title}"?`)) return
@@ -70,6 +82,13 @@ export function GalleryPage() {
         )}
 
         <section>
+          <GalleryToolbar
+            search={search}
+            onSearchChange={setSearch}
+            sort={sort}
+            onSortChange={setSort}
+          />
+
           {error && <ErrorBanner message={(error as Error).message} />}
 
           {isLoading ? (

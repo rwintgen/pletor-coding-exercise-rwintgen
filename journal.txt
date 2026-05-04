@@ -91,3 +91,18 @@
 - Removed legacy `App.css` and old monolithic `App.tsx`
 - Build + lint clean (351 KB JS, 108 KB gzipped)
 - Skipped Shadcn/Radix to keep things simple per company guidance ("simplicité et efficacité")
+- Commit: `7866c58` — feat: frontend auth + polished gallery (phases 3 & 4)
+
+### Search, Sort, User Profiles
+- Backend: added `?search`, `?user`, `?sort` query params to `GET /images/`
+  - `search`: case-insensitive ILIKE on title
+  - `user`: exact username filter
+  - `sort`: `newest` (default), `oldest`, `title`
+- Backend: new `routers/users.py` with `GET /users/{username}` (profile) and `GET /users/{username}/images`
+- Frontend: `GalleryToolbar` component — search input + sort dropdown
+- Frontend: `ProfilePage` at `/user/:username` — shows user info + their images; owner can delete
+- Frontend: username is clickable in both `ImageCard` and `ImageDetail` lightbox → links to profile
+- Frontend: Navbar "Signed in as X" links to own profile
+- 11 new backend tests (search, case-insensitive, filter by user, sort oldest, sort title, no results, user profile, user not found, user images, empty, not found)
+- Total: 42 tests, all passing
+- Docs updated: API table, routing table, component list

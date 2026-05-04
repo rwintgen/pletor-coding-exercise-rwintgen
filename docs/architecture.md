@@ -21,11 +21,21 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 | POST | /auth/register | No | Create user, returns UserRead |
 | POST | /auth/login | No | Returns JWT access_token |
 | GET | /auth/me | Yes | Returns current user |
-| GET | /images/ | No | List all images (newest first) |
+| GET | /images/ | No | List images (supports ?search, ?user, ?sort) |
 | GET | /images/quota | Yes | Returns quota status (user + global) |
 | GET | /images/{id} | No | Get single image |
 | POST | /images/upload | Yes | Upload image (429 if quota exceeded) |
 | DELETE | /images/{id} | Yes | Delete image (owner only, 403 otherwise) |
+| GET | /users/{username} | No | Get user profile |
+| GET | /users/{username}/images | No | Get all images by a user |
+
+### Search & Sort Query Parameters (GET /images/)
+
+| Param | Type | Description |
+|-------|------|-------------|
+| search | string | Case-insensitive title search (ILIKE) |
+| user | string | Filter by exact username |
+| sort | string | `newest` (default), `oldest`, or `title` |
 
 ## Auth Flow
 
@@ -43,20 +53,22 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 - **stores/auth.ts**: Zustand store with `persist` middleware (token + user persisted to localStorage)
 - **lib/schemas.ts**: Zod validation schemas (login, register, upload)
 - **lib/queryClient.ts**: TanStack Query client singleton
-- **hooks/useImages.ts**: `useImages`, `useUploadImage`, `useDeleteImage` query/mutation hooks
+- **hooks/useImages.ts**: `useImages`, `useUserImages`, `useUploadImage`, `useDeleteImage` query/mutation hooks
 - **hooks/useQuota.ts**: `useQuota` query hook (skipped when unauthenticated)
 - **components/ui/**: primitives (`Button`, `Input`, `Card`, `Spinner`)
-- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `Modal`, `EmptyState`, `ErrorBanner`)
+- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `GalleryToolbar`, `Modal`, `EmptyState`, `ErrorBanner`)
 - **features/auth/**: `LoginPage`, `RegisterPage`, shared `AuthShell`
 - **features/gallery/**: `GalleryPage`, `UploadForm`, `ImageDetail` (lightbox)
+- **features/profile/**: `ProfilePage` (user's images with delete for own)
 - **theme.ts**: design tokens (colors, spacing, typography, radii, shadows, transitions)
-- **App.tsx**: `BrowserRouter` with routes `/`, `/login`, `/register`; revalidates persisted token via `/auth/me` on mount
+- **App.tsx**: `BrowserRouter` with routes `/`, `/login`, `/register`, `/user/:username`; revalidates persisted token via `/auth/me` on mount
 
 ### Routing
 
 | Path | Behavior |
 |------|----------|
-| `/` | Public gallery; upload panel shown only when authenticated |
+| `/` | Public gallery with search/sort toolbar; upload panel shown only when authenticated |
+| `/user/:username` | User profile — shows their images; owner can delete |
 | `/login` | Redirects to `/` if already authenticated |
 | `/register` | Redirects to `/` if already authenticated |
 | `*` | Redirects to `/` |

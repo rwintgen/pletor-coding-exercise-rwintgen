@@ -44,9 +44,12 @@ export function Navbar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: spacing.lg }}>
         {user ? (
           <>
-            <span style={{ color: colors.neutral[600], fontSize: typography.fontSize.sm }}>
+            <Link
+              to={`/user/${user.username}`}
+              style={{ color: colors.neutral[600], fontSize: typography.fontSize.sm, textDecoration: 'none' }}
+            >
               Signed in as <strong style={{ color: colors.neutral[900] }}>{user.username}</strong>
-            </span>
+            </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               Sign out
             </Button>

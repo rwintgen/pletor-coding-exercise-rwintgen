@@ -5,6 +5,7 @@ import { Navbar } from './components/Navbar'
 import { LoginPage } from './features/auth/LoginPage'
 import { RegisterPage } from './features/auth/RegisterPage'
 import { GalleryPage } from './features/gallery/GalleryPage'
+import { ProfilePage } from './features/profile/ProfilePage'
 import { useAuthStore } from './stores/auth'
 
 /**
@@ -27,6 +28,7 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<GalleryPage />} />
+        <Route path="/user/:username" element={<ProfilePage />} />
         <Route
           path="/login"
           element={token ? <Navigate to="/" replace /> : <LoginPage />}

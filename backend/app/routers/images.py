@@ -1,7 +1,8 @@
 import uuid
 from pathlib import Path
+from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -71,12 +72,27 @@ async def upload_image(
 
 
 @router.get("/", response_model=list[ImageRead])
-async def list_images(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(Image, User.username)
-        .join(User, Image.user_id == User.id)
-        .order_by(Image.created_at.desc())
-    )
+async def list_images(
+    db: AsyncSession = Depends(get_db),
+    search: Optional[str] = Query(None, description="Search by title"),
+    user: Optional[str] = Query(None, description="Filter by username"),
+    sort: Optional[str] = Query("newest", description="Sort: newest, oldest, title"),
+):
+    stmt = select(Image, User.username).join(User, Image.user_id == User.id)
+
+    if search:
+        stmt = stmt.where(Image.title.ilike(f"%{search}%"))
+    if user:
+        stmt = stmt.where(User.username == user)
+
+    if sort == "oldest":
+        stmt = stmt.order_by(Image.created_at.asc())
+    elif sort == "title":
+        stmt = stmt.order_by(Image.title.asc())
+    else:
+        stmt = stmt.order_by(Image.created_at.desc())
+
+    result = await db.execute(stmt)
     return [_image_to_response(row.Image, row.username) for row in result.all()]
 
 

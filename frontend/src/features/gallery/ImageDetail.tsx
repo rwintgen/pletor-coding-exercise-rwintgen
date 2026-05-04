@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Image, getImageUrl } from '../../api/client'
 import { Modal } from '../../components/Modal'
 import { colors, spacing, typography } from '../../theme'
@@ -46,7 +47,7 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
               }}
             >
               <span>
-                by <strong style={{ color: colors.primary[600] }}>{image.username}</strong>
+                by <Link to={`/user/${image.username}`} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none' }}>{image.username}</Link>
               </span>
               <span>{new Date(image.created_at).toLocaleString()}</span>
               {image.file_size && <span>{(image.file_size / 1024).toFixed(1)} KB</span>}

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Image, getImageUrl } from '../api/client'
 import { useAuthStore } from '../stores/auth'
 import { colors, radii, spacing, typography } from '../theme'
@@ -103,7 +104,7 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
             color: colors.neutral[500],
           }}
         >
-          <span>by <strong style={{ color: colors.primary[600] }}>{image.username}</strong></span>
+          <span>by <Link to={`/user/${image.username}`} onClick={(e) => e.stopPropagation()} style={{ color: colors.primary[600], fontWeight: 600, textDecoration: 'none' }}>{image.username}</Link></span>
           <span>{new Date(image.created_at).toLocaleDateString()}</span>
         </div>
       </div>
