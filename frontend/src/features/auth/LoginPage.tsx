@@ -61,7 +61,7 @@ export function LoginPage() {
           autoComplete="current-password"
         />
         {error && <ErrorBanner message={error} />}
-        <Button type="submit" fullWidth disabled={submitting}>
+        <Button type="submit" variant="glimmer" fullWidth disabled={submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </Button>
         <p

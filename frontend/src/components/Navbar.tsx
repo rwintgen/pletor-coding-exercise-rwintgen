@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
 import { useThemeStore } from '../stores/theme'
@@ -39,7 +39,6 @@ export function Navbar() {
   const navigate = useNavigate()
   const themeMode = useThemeStore((s) => s.mode)
   const cycleTheme = useThemeStore((s) => s.cycle)
-  const [themeHover, setThemeHover] = useState(false)
 
   const handleLogout = () => {
     clear()
@@ -82,29 +81,16 @@ export function Navbar() {
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: spacing.lg }}>
-        <button
+        <Button
+          variant="icon"
+          size="sm"
+          square
           onClick={cycleTheme}
-          onMouseEnter={() => setThemeHover(true)}
-          onMouseLeave={() => setThemeHover(false)}
           aria-label={THEME_ICONS[themeMode].title}
           title={THEME_ICONS[themeMode].title}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 36,
-            height: 36,
-            borderRadius: radii.lg,
-            border: 'none',
-            background: themeHover ? colors.neutral[100] : 'transparent',
-            color: colors.neutral[600],
-            cursor: 'pointer',
-            transition: `background ${transitions.fast}, color ${transitions.fast}`,
-            padding: 0,
-          }}
         >
           {THEME_ICONS[themeMode].svg}
-        </button>
+        </Button>
         {user ? (
           <>
             <Link
@@ -162,19 +148,26 @@ export function Navbar() {
             <Link
               to="/login"
               style={{
-                color: colors.neutral[700],
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: `0 ${spacing.sm}`,
+                height: 36,
+                borderRadius: radii.lg,
+                color: colors.neutral[600],
                 textDecoration: 'none',
                 fontSize: typography.fontSize.sm,
                 fontWeight: typography.fontWeight.medium,
-                transition: `color ${transitions.fast}`,
+                background: 'transparent',
+                transition: `background ${transitions.fast}`,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = colors.primary[600] }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = colors.neutral[700] }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = colors.neutral[100] }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
               Sign in
             </Link>
             <Link to="/register" style={{ textDecoration: 'none' }}>
-              <Button size="sm">Sign up</Button>
+              <Button variant="glimmer" size="sm">Sign up</Button>
             </Link>
           </>
         )}

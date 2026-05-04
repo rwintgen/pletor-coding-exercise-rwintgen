@@ -182,7 +182,10 @@ async def test_upload_oversized_file_rejected(client, monkeypatch):
     monkeypatch.setattr(images_router, "MAX_UPLOAD_BYTES", 50, raising=True)
 
     token = await register_and_login(client)
-    big = ("file", ("big.png", io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 5000), "image/png"))
+    big = (
+        "file",
+        ("big.png", io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 5000), "image/png"),
+    )
     res = await client.post(
         "/images/upload",
         data={"title": "big"},

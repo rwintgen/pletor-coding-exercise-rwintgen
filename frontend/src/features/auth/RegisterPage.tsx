@@ -63,7 +63,7 @@ export function RegisterPage() {
           autoComplete="new-password"
         />
         {error && <ErrorBanner message={error} />}
-        <Button type="submit" fullWidth disabled={submitting}>
+        <Button type="submit" variant="glimmer" fullWidth disabled={submitting}>
           {submitting ? 'Creating account…' : 'Create account'}
         </Button>
         <p

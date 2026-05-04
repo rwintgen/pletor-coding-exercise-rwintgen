@@ -138,9 +138,7 @@ async def update_image(
     if image is None:
         raise HTTPException(status_code=404, detail="Image not found")
     if image.user_id != current_user.id:
-        raise HTTPException(
-            status_code=403, detail="You can only edit your own images"
-        )
+        raise HTTPException(status_code=403, detail="You can only edit your own images")
     image.title = body.title
     await db.commit()
     await db.refresh(image)

@@ -70,17 +70,17 @@ USER_COUNTS = [15, 12, 10, 10, 8]
 # Varied aspect ratios + resolutions to stress-test the masonry layout.
 # Cycled through deterministically so reseeds are stable.
 DIMENSIONS = [
-    (1200, 800),   # 3:2 landscape
-    (800, 1200),   # 2:3 portrait
+    (1200, 800),  # 3:2 landscape
+    (800, 1200),  # 2:3 portrait
     (1000, 1000),  # square
-    (1600, 900),   # 16:9 widescreen
-    (900, 1600),   # 9:16 tall portrait
-    (1400, 700),   # 2:1 panoramic
-    (600, 800),    # 3:4 portrait, lower-res
+    (1600, 900),  # 16:9 widescreen
+    (900, 1600),  # 9:16 tall portrait
+    (1400, 700),  # 2:1 panoramic
+    (600, 800),  # 3:4 portrait, lower-res
     (1800, 1200),  # 3:2 high-res landscape
-    (700, 1050),   # 2:3 portrait, mid-res
-    (1024, 768),   # 4:3 classic landscape
-    (768, 1024),   # 3:4 classic portrait
+    (700, 1050),  # 2:3 portrait, mid-res
+    (1024, 768),  # 4:3 classic landscape
+    (768, 1024),  # 3:4 classic portrait
     (1200, 1500),  # 4:5 social-media portrait
 ]
 
@@ -96,15 +96,15 @@ def _ts(days: int, hours: int = 0) -> datetime:
 
 
 TIMESTAMPS = [
-    _ts(0, 2),     # today
-    _ts(0, 5),     # today (same day, different hour)
+    _ts(0, 2),  # today
+    _ts(0, 5),  # today (same day, different hour)
     _ts(2, 0),
-    _ts(2, 0),     # duplicate of previous (same exact created_at)
+    _ts(2, 0),  # duplicate of previous (same exact created_at)
     _ts(7, 4),
     _ts(14, 0),
     _ts(21, 8),
     _ts(30, 0),
-    _ts(30, 0),    # duplicate
+    _ts(30, 0),  # duplicate
     _ts(45, 6),
     _ts(60, 0),
     _ts(75, 12),
@@ -113,7 +113,7 @@ TIMESTAMPS = [
     _ts(130, 0),
     _ts(150, 9),
     _ts(170, 0),
-    _ts(170, 0),   # duplicate
+    _ts(170, 0),  # duplicate
     _ts(195, 0),
     _ts(220, 5),
     _ts(245, 0),
@@ -121,7 +121,7 @@ TIMESTAMPS = [
     _ts(295, 11),
     _ts(320, 0),
     _ts(345, 0),
-    _ts(345, 0),   # duplicate
+    _ts(345, 0),  # duplicate
     _ts(370, 7),
     _ts(395, 0),
     _ts(420, 0),
@@ -135,11 +135,11 @@ TIMESTAMPS = [
     _ts(620, 0),
     _ts(645, 0),
     _ts(670, 8),
-    _ts(670, 8),   # duplicate
+    _ts(670, 8),  # duplicate
     _ts(690, 0),
     _ts(710, 0),
     _ts(720, 5),
-    _ts(720, 5),   # duplicate
+    _ts(720, 5),  # duplicate
     _ts(725, 0),
     _ts(728, 0),
     _ts(729, 3),

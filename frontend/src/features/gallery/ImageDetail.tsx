@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Image, getImageUrl } from '../../api/client'
 import { Modal } from '../../components/Modal'
+import { Button } from '../../components/ui/Button'
 import { useRenameImage } from '../../hooks/useImages'
 import { useAuthStore } from '../../stores/auth'
 import { colors, radii, spacing, transitions, typography } from '../../theme'
@@ -104,51 +105,27 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
                     outline: 'none',
                   }}
                 />
-                <button
+                <Button
                   type="submit"
+                  variant="icon"
+                  size="sm"
+                  square
                   aria-label="Save title"
-                  style={{
-                    flexShrink: 0,
-                    width: 36,
-                    height: 36,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: colors.primary[500],
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: radii.lg,
-                    cursor: 'pointer',
-                    transition: `background ${transitions.fast}`,
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = colors.primary[600] }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = colors.primary[500] }}
+                  style={{ background: colors.primary[500], color: '#fff', flexShrink: 0 }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="icon"
+                  size="sm"
+                  square
                   aria-label="Cancel editing"
                   onClick={() => setEditing(false)}
-                  style={{
-                    flexShrink: 0,
-                    width: 36,
-                    height: 36,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: colors.neutral[200],
-                    color: colors.neutral[600],
-                    border: 'none',
-                    borderRadius: radii.lg,
-                    cursor: 'pointer',
-                    transition: `background ${transitions.fast}`,
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = colors.neutral[300] }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = colors.neutral[200] }}
+                  style={{ background: colors.neutral[200], color: colors.neutral[600], flexShrink: 0 }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                </button>
+                </Button>
               </form>
             ) : (
               <h2

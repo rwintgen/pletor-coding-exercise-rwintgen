@@ -156,12 +156,16 @@ async def test_pagination_limit_offset(client):
             headers=auth_header(token),
         )
 
-    res = await client.get("/images/", params={"limit": 2, "offset": 0, "sort": "oldest"})
+    res = await client.get(
+        "/images/", params={"limit": 2, "offset": 0, "sort": "oldest"}
+    )
     data = res.json()
     assert len(data) == 2
     assert data[0]["title"] == "img0"
 
-    res2 = await client.get("/images/", params={"limit": 2, "offset": 2, "sort": "oldest"})
+    res2 = await client.get(
+        "/images/", params={"limit": 2, "offset": 2, "sort": "oldest"}
+    )
     data2 = res2.json()
     assert len(data2) == 2
     assert data2[0]["title"] == "img2"

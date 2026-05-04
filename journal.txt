@@ -215,3 +215,16 @@ Result targets the 8.5/10 ceiling identified in the audit: env-driven config, fi
 - **Blurred lightbox background**: portrait/narrow images in the `ImageDetail` modal now show a blurred + dimmed version of the same image as background (`filter: blur(30px) brightness(0.6)`) instead of flat black/white bands.
 - **UI tweaks**: FAB corners rounder (`radii.lg` → `radii.xl`), profile avatar changed from circle to rounded square (`radii.full` → `radii.lg`), EmptyState emoji background same change.
 - **Full-height pages**: added `minHeight: '100vh'` to `GalleryPage` and `ProfilePage` so the body radial gradient always reaches the viewport bottom.
+
+### Navbar logged-out polish + Button component consolidation
+- **Sign in link**: replaced text-color-change hover with background-highlight hover (`neutral[100]`), matching the theme toggle button style. Now styled as a pill (36px height, `radii.lg`).
+- **Sign up button**: new `glimmer` variant added to `Button`. At rest it looks like `primary` (brand gradient, white text). On hover the gradient is stretched to 200% width and the `glimmer` keyframe sweeps `background-position` at 0.1s (fast shimmer). No `translateY` lift — stays in place.
+- **Button `icon` variant**: new variant for small square icon-only buttons — transparent bg, `neutral[600]` color, `neutral[100]` bg on hover, `radii.lg`. Added `square` prop (forces `width = height` based on size).
+- **Converted raw `<button>` elements**:
+  - Navbar theme toggle → `<Button variant="icon" size="sm" square>`
+  - ImageDetail save/cancel icon buttons → `<Button variant="icon" size="sm" square>` with custom background/color via `style`
+- **Not converted** (too specialized for the Button API):
+  - `Fab.tsx` — fixed-position FAB with scale animation
+  - `ImageCard.tsx` delete — absolute-positioned overlay with backdrop blur
+  - `ErrorBanner.tsx` dismiss — minimal inline "×" character
+- Button variant type now: `primary | secondary | danger | ghost | glimmer | icon`

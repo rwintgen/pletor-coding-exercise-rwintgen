@@ -1,4 +1,3 @@
-
 import pytest
 
 
@@ -85,7 +84,9 @@ async def test_register_empty_username(client):
 
 @pytest.mark.asyncio
 async def test_register_empty_password(client):
-    res = await client.post("/auth/register", json={"username": "user1", "password": ""})
+    res = await client.post(
+        "/auth/register", json={"username": "user1", "password": ""}
+    )
     assert res.status_code in (400, 422)
 
 
