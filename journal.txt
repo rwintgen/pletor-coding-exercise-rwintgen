@@ -1,0 +1,19 @@
+# Project Journal
+
+## Session 1 — Initial Setup
+
+### Actions taken
+- Created `.github/copilot-instructions.md` with workflow rules and coding standards
+- Created `format.sh` using ESLint (frontend) and Ruff (backend) for consistent formatting
+- Scaffolded the frontend project structure: features/, lib/, stores/, components/ui/
+- Created `theme.ts` with design tokens (colors, spacing, typography, radii, shadows)
+- Created `/docs` folder with architecture documentation
+
+### Reasoning
+- Chose TanStack Query + Zustand + Zod + Shadcn as instructed by the company's preferred stack
+- Chose feature-based folder structure (features/) to co-locate auth, gallery, and upload logic rather than flat component directories — scales better for this multi-feature task
+- Used CSS custom properties in theme.ts for runtime flexibility and easy theming
+- Used Ruff for backend formatting as it's the modern standard for Python (fast, replaces black + isort + flake8)
+
+### Commits
+- (none yet — awaiting instruction to commit)
