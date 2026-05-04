@@ -63,6 +63,8 @@ export function GalleryToolbar({
           strokeWidth="2.2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-hidden="true"
+          focusable="false"
           style={{
             position: 'absolute',
             left: 14,

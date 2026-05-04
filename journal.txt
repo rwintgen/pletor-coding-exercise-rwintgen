@@ -134,3 +134,42 @@
 - **Batch upload**: `DropZone` now accepts `multiple` files (drop or browse). `UploadForm` uploads sequentially, shows `Uploading 3/5…` progress, falls back to filename-as-title when shared title is empty, and pre-flight-checks the selection against remaining daily quota (refuses to start if it would exceed).
 - **Dark mode (auto, follows system)**: introduced full CSS variable palette in `index.css` (`--neutral-0..950`, `--primary-50..700`, `--accent-400..600`, `--bg-page`, `--surface-glass`, `--scrollbar-thumb`, etc.). `theme.ts` `colors.neutral/primary/accent` now resolve to `var(--…)` so existing inline styles automatically swap. `@media (prefers-color-scheme: dark)` overrides every var with an inverted palette. Navbar glass and Auth shell radial backdrop use vars too. No flash, no toggle, no app-wide refactor.
 - Lint + build clean (4.37 KB CSS, 366 KB JS).
+
+### Final audit pass (interview polish)
+Ran a structured audit across components/theming, docs, architecture, tests, security, a11y, build hygiene. Acted on the high-impact findings:
+
+**Backend**
+- New `app/config.py`: single source of truth for `JWT_SECRET`, `JWT_ALGORITHM`, `JWT_EXPIRE_MINUTES`, `CORS_ORIGINS`, `MAX_UPLOAD_BYTES`, `USER_DAILY_LIMIT`, `GLOBAL_DAILY_LIMIT`. All read from env vars with sane defaults; auth/main/quota/images now import from it. Production deployments override via env without code changes.
+- Removed hardcoded `SECRET_KEY = "dev-secret-change-in-production"` from `auth.py`.
+- Added `MAX_UPLOAD_BYTES` enforcement in upload route → 413 on oversized files. Defaults to 10 MB.
+- Extracted `_image_to_response` (was duplicated in `routers/images.py` and `routers/users.py`) into `schemas.image_to_dict`. Both routers now share one helper.
+- Added `_get_user_or_404` helper in `routers/users.py` (was duplicated lookup logic).
+- Docstrings added to every endpoint and to `get_current_user`, `image_to_dict`, `_today_start`.
+
+**Frontend**
+- New `tsconfig.json` with `strict: true`, `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`. Added `tsc --noEmit` as `npm run typecheck`. Codebase passes strict mode unchanged — confirms type quality was already solid.
+- New `vite-env.d.ts` typing `import.meta.env.VITE_API_URL`.
+- `api/client.ts`: `API_URL` now reads from `VITE_API_URL` env var, fallback to localhost.
+- New `lib/errors.ts` with typed `errorMessage(unknown)` helper. Replaced all `catch (err: any) { setError(err.message) }` patterns in `LoginPage`, `RegisterPage`, `UploadForm` with `catch (err) { setError(errorMessage(err)) }`.
+- `ProfilePage`: account-deletion was silently swallowing errors → now surfaces them via an `ErrorBanner`.
+- `App.tsx`: added comment to the intentional empty `.catch()` (token expired → clear auth) so intent is explicit.
+- A11y: added `aria-hidden` + `focusable="false"` to decorative search SVG in `GalleryToolbar`.
+
+**Tests (+4 → 47 total)**
+- `test_upload_oversized_file_rejected` — verifies 413 on payloads larger than `MAX_UPLOAD_BYTES`.
+- `test_delete_image_is_idempotent` — first delete → 204, second delete → 404; safe to retry.
+- `test_search_param_does_not_leak_sql` — proves SQLAlchemy parameterizes user input (`' OR '1'='1` returns no rows).
+- `test_expired_token_rejected` — manually mints an expired JWT with the live secret and confirms 401.
+
+**Repo hygiene**
+- New `.env.example` documenting every env var (backend + `VITE_API_URL`).
+- Expanded `.gitignore` (was 4 lines): now covers `.env*`, `.DS_Store`, `__pycache__`, `dist/`, `backend/test.db`, `backend/uploads/`, etc.
+- Untracked `backend/test.db` (regenerates on startup via `seed_if_empty`).
+
+**Docs**
+- `docs/architecture.md`: added `config.py` and `services/quota.py` to backend file list, added `DELETE /auth/account` to the API table, documented `image_to_dict` shared helper, fixed `search` description (also matches usernames), fixed status code list on upload (400 / 413 / 429), documented `delete` idempotency.
+
+**Verification**
+- `tsc --noEmit` clean. `eslint .` clean. `vite build` clean (4.4 KB CSS, 367 KB JS). `pytest` 47/47 pass.
+
+Result targets the 8.5/10 ceiling identified in the audit: env-driven config, file-size enforcement, typed error handling, strict TypeScript, expanded edge-case tests, and a clean repo.

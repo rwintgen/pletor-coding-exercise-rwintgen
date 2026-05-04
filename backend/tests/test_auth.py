@@ -87,3 +87,33 @@ async def test_register_empty_username(client):
 async def test_register_empty_password(client):
     res = await client.post("/auth/register", json={"username": "user1", "password": ""})
     assert res.status_code in (400, 422)
+
+
+@pytest.mark.asyncio
+async def test_expired_token_rejected(client):
+    """Tokens past their expiry must be rejected with 401, even though the
+    signature itself is valid."""
+    from datetime import datetime, timedelta, timezone
+
+    from jose import jwt
+
+    from app.config import JWT_ALGORITHM, JWT_SECRET
+
+    await client.post(
+        "/auth/register", json={"username": "expired_user", "password": "pw"}
+    )
+    res = await client.post(
+        "/auth/login", json={"username": "expired_user", "password": "pw"}
+    )
+    user_id = 1  # first user in this isolated test DB
+    expired = jwt.encode(
+        {
+            "sub": str(user_id),
+            "exp": datetime.now(timezone.utc) - timedelta(minutes=5),
+        },
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+    me = await client.get("/auth/me", headers={"Authorization": f"Bearer {expired}"})
+    assert me.status_code == 401
+    assert res.status_code == 200  # original login worked fine

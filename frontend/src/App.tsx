@@ -19,6 +19,8 @@ export default function App() {
     if (token && !user) {
       getMe()
         .then(setUser)
+        // Token persisted in localStorage but rejected by the server (expired
+        // or revoked) — clear local auth so the user is sent back to login.
         .catch(() => clear())
     }
   }, [token, user, setUser, clear])

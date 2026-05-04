@@ -186,10 +186,7 @@ docker-compose.yml
 - [x] Profile links from image cards and lightbox
 - [x] DB indexes on `title`, `created_at`, `user_id` for performance
 - [x] Pagination support in API (`limit`/`offset` params)
-- [x] 43 automated tests (auth, upload, delete, quota, pagination)
-
-### Not implemented (would do with more time)
-
+- [x] 47 automated tests (auth, upload, delete, quota, pagination, file size, idempotency, expired JWT, SQL-injection-style search)
 - [x] Batch upload (multiple files at once) — drop or select many; shared optional title falls back to filename; sequential upload with `Uploading 3/5…` progress; pre-flight check against remaining daily quota
 - [x] Masonry layout (respects each image's natural aspect ratio) — CSS multi-column, responsive 4→3→2→1 columns, no cropping
 - [x] "Load more" infinite scroll in the frontend — `useInfiniteQuery` paginates via API `limit`/`offset`

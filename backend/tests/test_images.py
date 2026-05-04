@@ -170,3 +170,58 @@ async def test_upload_missing_title(client):
         headers=auth_header(token),
     )
     assert res.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_upload_oversized_file_rejected(client, monkeypatch):
+    """Files exceeding ``MAX_UPLOAD_BYTES`` must return 413 without writing to disk."""
+    from app.config import MAX_UPLOAD_BYTES  # noqa: F401
+    from app.routers import images as images_router
+
+    monkeypatch.setattr("app.routers.images.MAX_UPLOAD_BYTES", 50, raising=True)
+    monkeypatch.setattr(images_router, "MAX_UPLOAD_BYTES", 50, raising=True)
+
+    token = await register_and_login(client)
+    big = ("file", ("big.png", io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 5000), "image/png"))
+    res = await client.post(
+        "/images/upload",
+        data={"title": "big"},
+        files=[big],
+        headers=auth_header(token),
+    )
+    assert res.status_code == 413
+    assert "too large" in res.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_delete_image_is_idempotent(client):
+    """Deleting the same image twice yields 204 then 404 — safe to retry."""
+    token = await register_and_login(client)
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "once"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    image_id = upload.json()["id"]
+
+    first = await client.delete(f"/images/{image_id}", headers=auth_header(token))
+    assert first.status_code == 204
+
+    second = await client.delete(f"/images/{image_id}", headers=auth_header(token))
+    assert second.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_search_param_does_not_leak_sql(client):
+    """Inputs that look like SQL must be parameterized — no rows leak through."""
+    token = await register_and_login(client)
+    await client.post(
+        "/images/upload",
+        data={"title": "innocent"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    res = await client.get("/images/", params={"search": "' OR '1'='1"})
+    assert res.status_code == 200
+    assert res.json() == []

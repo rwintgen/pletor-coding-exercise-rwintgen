@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { useUploadImage } from '../../hooks/useImages'
 import { useQuota } from '../../hooks/useQuota'
+import { errorMessage } from '../../lib/errors'
 import { uploadSchema } from '../../lib/schemas'
 import { colors, spacing, typography } from '../../theme'
 
@@ -69,10 +70,10 @@ export function UploadForm({ onSuccess }: UploadFormProps) {
       setFiles([])
       setProgress(null)
       onSuccess?.()
-    } catch (err: any) {
+    } catch (err) {
       // Some files may already have uploaded — keep the rest selected so the
       // user can retry without losing context.
-      setError(err.message)
+      setError(errorMessage(err))
       setProgress(null)
     }
   }

@@ -11,6 +11,7 @@ import { Modal } from '../../components/Modal'
 import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useUserImages } from '../../hooks/useImages'
+import { errorMessage } from '../../lib/errors'
 import { useAuthStore } from '../../stores/auth'
 import { colors, gradients, radii, spacing, typography } from '../../theme'
 import { ImageDetail } from '../gallery/ImageDetail'
@@ -24,6 +25,7 @@ export function ProfilePage() {
   const isOwnProfile = currentUser?.username === username
   const [active, setActive] = useState<Image | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
   const navigate = useNavigate()
 
@@ -201,17 +203,24 @@ export function ProfilePage() {
             disabled={deleting}
             onClick={async () => {
               setDeleting(true)
+              setDeleteError(null)
               try {
                 await deleteAccount()
                 clear()
                 navigate('/')
-              } catch {
+              } catch (err) {
+                setDeleteError(errorMessage(err))
                 setDeleting(false)
               }
             }}
           >
             {deleting ? 'Deleting account…' : 'Delete my account'}
           </Button>
+          {deleteError && (
+            <div style={{ marginTop: spacing.md }}>
+              <ErrorBanner message={deleteError} onDismiss={() => setDeleteError(null)} />
+            </div>
+          )}
         </div>
       )}
     </div>

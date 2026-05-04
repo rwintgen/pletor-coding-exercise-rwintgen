@@ -1,4 +1,9 @@
-export const API_URL = 'http://localhost:8000'
+/**
+ * Base URL of the backend API. Sourced from `VITE_API_URL` so the same build
+ * artifact can target dev/staging/prod, falling back to localhost for the
+ * default Docker compose setup.
+ */
+export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 /** Image as returned by the backend API */
 export interface Image {

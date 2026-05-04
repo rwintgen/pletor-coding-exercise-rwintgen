@@ -6,11 +6,14 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 
 ## Backend
 
-- **routers/auth.py**: POST /auth/register, POST /auth/login, GET /auth/me
-- **routers/images.py**: CRUD for images (upload/delete require auth)
-- **auth.py**: bcrypt hashing, JWT (HS256, 24h expiry), `get_current_user` dependency
-- **models.py**: SQLAlchemy ORM models (User, Image)
-- **schemas.py**: Pydantic request/response schemas (UserCreate, UserRead, Token, ImageRead)
+- **config.py**: Centralized configuration sourced from environment variables (JWT secret/expiry, CORS origins, upload size cap, quotas). All tunables live here so deployments can override without touching code. See `.env.example` for the full list.
+- **routers/auth.py**: POST /auth/register, POST /auth/login, GET /auth/me, DELETE /auth/account
+- **routers/images.py**: CRUD for images (upload/delete require auth, owner-only delete)
+- **routers/users.py**: GET /users/{username}, GET /users/{username}/images
+- **services/quota.py**: Daily quota counters + `enforce_quota()` (per-user + global)
+- **auth.py**: bcrypt hashing, JWT (HS256), `get_current_user` dependency — secret + expiry sourced from `config.py`
+- **models.py**: SQLAlchemy ORM models (User, Image) with cascade delete on user → images
+- **schemas.py**: Pydantic request/response schemas + `image_to_dict` helper used by both image and user routers to keep response shape consistent
 - **seed.py**: Creates users + images on first boot
 - **db.py**: Async SQLite via aiosqlite
 
@@ -21,11 +24,12 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 | POST | /auth/register | No | Create user, returns UserRead |
 | POST | /auth/login | No | Returns JWT access_token |
 | GET | /auth/me | Yes | Returns current user |
-| GET | /images/ | No | List images (supports ?search, ?user, ?sort) |
+| DELETE | /auth/account | Yes | Delete the calling user (cascades images) |
+| GET | /images/ | No | List images (supports ?search, ?user, ?sort, ?limit, ?offset) |
 | GET | /images/quota | Yes | Returns quota status (user + global) |
 | GET | /images/{id} | No | Get single image |
-| POST | /images/upload | Yes | Upload image (429 if quota exceeded) |
-| DELETE | /images/{id} | Yes | Delete image (owner only, 403 otherwise) |
+| POST | /images/upload | Yes | Upload image (400 wrong type, 413 too large, 429 quota exceeded) |
+| DELETE | /images/{id} | Yes | Delete image (owner only — 403 otherwise, 404 if missing, idempotent) |
 | GET | /users/{username} | No | Get user profile |
 | GET | /users/{username}/images | No | Get all images by a user |
 
@@ -33,7 +37,7 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 
 | Param | Type | Description |
 |-------|------|-------------|
-| search | string | Case-insensitive title search (ILIKE) |
+| search | string | Case-insensitive ILIKE on title **and** username |
 | user | string | Filter by exact username |
 | sort | string | `newest` (default), `oldest`, or `title` |
 | limit | int | Page size, 1–200 (default 50) |

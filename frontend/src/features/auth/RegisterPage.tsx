@@ -4,6 +4,7 @@ import { getMe, login, register } from '../../api/client'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
+import { errorMessage } from '../../lib/errors'
 import { registerSchema } from '../../lib/schemas'
 import { useAuthStore } from '../../stores/auth'
 import { colors, spacing, typography } from '../../theme'
@@ -34,8 +35,8 @@ export function RegisterPage() {
       const me = await getMe()
       setAuth(access_token, me)
       navigate('/')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(errorMessage(err))
     } finally {
       setSubmitting(false)
     }

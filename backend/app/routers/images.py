@@ -7,30 +7,16 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import get_current_user
+from app.config import ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES
 from app.db import get_db
 from app.models import Image, User
-from app.schemas import ImageRead, QuotaStatus
+from app.schemas import ImageRead, QuotaStatus, image_to_dict
 from app.services.quota import QuotaExceededError, check_quota, enforce_quota
 
 router = APIRouter(prefix="/images", tags=["images"])
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
-
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
-
-
-def _image_to_response(image: Image, username: str) -> dict:
-    return {
-        "id": image.id,
-        "created_at": image.created_at,
-        "title": image.title,
-        "user_id": image.user_id,
-        "username": username,
-        "url": image.url,
-        "file_size": image.file_size,
-        "content_type": image.content_type,
-    }
 
 
 @router.post("/upload", response_model=ImageRead)
@@ -40,6 +26,10 @@ async def upload_image(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Upload a single image. Enforces per-user and global daily quotas,
+    rejects unsupported content types, and rejects files larger than
+    ``MAX_UPLOAD_BYTES``.
+    """
     try:
         await enforce_quota(db, current_user.id)
     except QuotaExceededError as e:
@@ -51,11 +41,16 @@ async def upload_image(
             detail="File type not allowed. Use JPEG, PNG, GIF, or WebP.",
         )
 
+    content = await file.read()
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Max {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.",
+        )
+
     ext = Path(file.filename).suffix if file.filename else ".jpg"
     filename = f"{uuid.uuid4()}{ext}"
     file_path = UPLOAD_DIR / filename
-
-    content = await file.read()
     file_path.write_bytes(content)
 
     db_image = Image(
@@ -68,18 +63,21 @@ async def upload_image(
     db.add(db_image)
     await db.commit()
     await db.refresh(db_image)
-    return _image_to_response(db_image, current_user.username)
+    return image_to_dict(db_image, current_user.username)
 
 
 @router.get("/", response_model=list[ImageRead])
 async def list_images(
     db: AsyncSession = Depends(get_db),
-    search: Optional[str] = Query(None, description="Search by title"),
+    search: Optional[str] = Query(None, description="Search by title or username"),
     user: Optional[str] = Query(None, description="Filter by username"),
     sort: Optional[str] = Query("newest", description="Sort: newest, oldest, title"),
     limit: int = Query(50, ge=1, le=200, description="Page size"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
 ):
+    """Paginated, searchable, sortable image listing. Joins users in a single
+    query to avoid N+1 lookups for the ``username`` field.
+    """
     stmt = select(Image, User.username).join(User, Image.user_id == User.id)
 
     if search:
@@ -101,7 +99,7 @@ async def list_images(
 
     stmt = stmt.limit(limit).offset(offset)
     result = await db.execute(stmt)
-    return [_image_to_response(row.Image, row.username) for row in result.all()]
+    return [image_to_dict(row.Image, row.username) for row in result.all()]
 
 
 @router.get("/quota", response_model=QuotaStatus)
@@ -109,11 +107,13 @@ async def get_quota(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Return the caller's current quota usage and remaining capacity."""
     return await check_quota(db, current_user.id)
 
 
 @router.get("/{image_id}", response_model=ImageRead)
 async def get_image(image_id: int, db: AsyncSession = Depends(get_db)):
+    """Return a single image with its owner's username, or 404."""
     result = await db.execute(
         select(Image, User.username)
         .join(User, Image.user_id == User.id)
@@ -122,7 +122,7 @@ async def get_image(image_id: int, db: AsyncSession = Depends(get_db)):
     row = result.one_or_none()
     if row is None:
         raise HTTPException(status_code=404, detail="Image not found")
-    return _image_to_response(row.Image, row.username)
+    return image_to_dict(row.Image, row.username)
 
 
 @router.delete("/{image_id}", status_code=204)
@@ -131,6 +131,9 @@ async def delete_image(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Delete an image. Only the owner is authorized; non-existent ids return
+    404 (idempotent: a second delete on the same id also returns 404).
+    """
     result = await db.execute(select(Image).where(Image.id == image_id))
     image = result.scalar_one_or_none()
     if image is None:

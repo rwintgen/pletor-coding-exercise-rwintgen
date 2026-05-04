@@ -3,13 +3,12 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import GLOBAL_DAILY_LIMIT, USER_DAILY_LIMIT
 from app.models import Image
-
-USER_DAILY_LIMIT = 10
-GLOBAL_DAILY_LIMIT = 100
 
 
 def _today_start() -> datetime:
+    """Return today's UTC midnight as the lower bound for daily counters."""
     now = datetime.now(timezone.utc)
     return now.replace(hour=0, minute=0, second=0, microsecond=0)
 

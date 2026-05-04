@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.config import CORS_ORIGINS
 from app.db import Base, SessionLocal, engine
 from app.routers import auth, images, users
 from app.seed import seed_if_empty
@@ -23,7 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,4 +38,4 @@ app.include_router(users.router)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"status": "ok"}
