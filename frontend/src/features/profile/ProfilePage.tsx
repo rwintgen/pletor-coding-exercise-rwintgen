@@ -5,16 +5,18 @@ import type { Image } from '../../api/client'
 import { deleteAccount, getUserProfile } from '../../api/client'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
+import { Fab } from '../../components/Fab'
 import { ImageCard } from '../../components/ImageCard'
 import { Modal } from '../../components/Modal'
+import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useUserImages } from '../../hooks/useImages'
 import { useAuthStore } from '../../stores/auth'
-import { colors, radii, shadows, spacing, typography } from '../../theme'
+import { colors, gradients, radii, spacing, typography } from '../../theme'
 import { ImageDetail } from '../gallery/ImageDetail'
 import { UploadForm } from '../gallery/UploadForm'
 
-/** User profile page. Shows user info + their uploaded images. */
+/** User profile page. Shows user info + their uploaded images, with FAB upload + danger zone for owner. */
 export function ProfilePage() {
   const { username } = useParams<{ username: string }>()
   const currentUser = useAuthStore((s) => s.user)
@@ -46,7 +48,7 @@ export function ProfilePage() {
   if (profileLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: spacing['3xl'] }}>
-        <Spinner size={32} />
+        <Spinner size={36} />
       </div>
     )
   }
@@ -59,46 +61,80 @@ export function ProfilePage() {
     )
   }
 
+  const initial = (profile?.username ?? '?').charAt(0).toUpperCase()
+
   return (
     <div
+      className="page-enter"
       style={{
         maxWidth: 1280,
         margin: '0 auto',
-        padding: spacing.xl,
+        padding: `${spacing['2xl']} ${spacing.xl}`,
         fontFamily: typography.fontFamily,
       }}
     >
-      <header style={{ marginBottom: spacing['2xl'] }}>
-        <h1
+      <header
+        style={{
+          marginBottom: spacing['2xl'],
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing.lg,
+        }}
+      >
+        <div
           style={{
-            margin: 0,
+            width: 64,
+            height: 64,
+            borderRadius: radii.full,
+            background: gradients.brand,
+            color: colors.neutral[0],
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             fontSize: typography.fontSize['2xl'],
             fontWeight: typography.fontWeight.bold,
-            color: colors.neutral[900],
+            letterSpacing: '-0.02em',
+            boxShadow: '0 12px 28px -10px rgba(99,102,241,0.5)',
           }}
         >
-          {profile?.username}
-        </h1>
-        <p
-          style={{
-            marginTop: spacing.xs,
-            color: colors.neutral[500],
-            fontSize: typography.fontSize.sm,
-          }}
-        >
-          Joined {profile ? new Date(profile.created_at).toLocaleDateString() : ''}
-          {isOwnProfile && ' · This is your profile'}
-        </p>
+          {initial}
+        </div>
+        <div>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: typography.fontSize['3xl'],
+              fontWeight: typography.fontWeight.bold,
+              color: colors.neutral[900],
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {profile?.username}
+          </h1>
+          <p
+            style={{
+              marginTop: spacing.xs,
+              marginBottom: 0,
+              color: colors.neutral[500],
+              fontSize: typography.fontSize.sm,
+            }}
+          >
+            Joined {profile ? new Date(profile.created_at).toLocaleDateString() : ''}
+            {isOwnProfile && ' · This is your profile'}
+          </p>
+        </div>
       </header>
 
       {imagesError && <ErrorBanner message={(imagesError as Error).message} />}
 
       {imagesLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: spacing['3xl'] }}>
-          <Spinner size={32} />
+          <Spinner size={36} />
         </div>
       ) : images && images.length > 0 ? (
         <div
+          className="stagger-fade"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
@@ -116,6 +152,7 @@ export function ProfilePage() {
         </div>
       ) : (
         <EmptyState
+          icon="🖼️"
           title="No images"
           description={
             isOwnProfile
@@ -127,36 +164,7 @@ export function ProfilePage() {
 
       <ImageDetail image={active} onClose={() => setActive(null)} />
 
-      {isOwnProfile && (
-        <button
-          onClick={() => setShowUpload(true)}
-          aria-label="Upload image"
-          style={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            width: 56,
-            height: 56,
-            borderRadius: radii.xl,
-            background: colors.neutral[900],
-            color: colors.neutral[0],
-            border: 'none',
-            fontSize: '32px',
-            fontWeight: 300,
-            lineHeight: '56px',
-            textAlign: 'center' as const,
-            cursor: 'pointer',
-            boxShadow: shadows.xl,
-            padding: 0,
-            transition: 'transform 150ms ease',
-            zIndex: 40,
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = '' }}
-        >
-          +
-        </button>
-      )}
+      {isOwnProfile && <Fab onClick={() => setShowUpload(true)} />}
 
       <Modal open={showUpload} onClose={() => setShowUpload(false)} maxWidth={480}>
         <div style={{ padding: spacing.xl }}>
@@ -167,9 +175,11 @@ export function ProfilePage() {
       {isOwnProfile && (
         <div
           style={{
-            marginTop: spacing['3xl'],
-            paddingTop: spacing.xl,
-            borderTop: `1px solid ${colors.neutral[200]}`,
+            marginTop: spacing['4xl'],
+            padding: spacing.xl,
+            background: colors.error[50],
+            borderRadius: radii.xl,
+            border: `1px solid ${colors.error[500]}33`,
           }}
         >
           <h2
@@ -177,7 +187,8 @@ export function ProfilePage() {
               margin: 0,
               fontSize: typography.fontSize.base,
               fontWeight: typography.fontWeight.semibold,
-              color: colors.error[500],
+              color: colors.error[700],
+              letterSpacing: '-0.01em',
             }}
           >
             Danger zone
@@ -185,13 +196,15 @@ export function ProfilePage() {
           <p
             style={{
               marginTop: spacing.xs,
-              color: colors.neutral[500],
+              marginBottom: spacing.md,
+              color: colors.neutral[600],
               fontSize: typography.fontSize.sm,
             }}
           >
             Permanently delete your account and all your images.
           </p>
-          <button
+          <Button
+            variant="danger"
             disabled={deleting}
             onClick={async () => {
               setDeleting(true)
@@ -203,22 +216,12 @@ export function ProfilePage() {
                 setDeleting(false)
               }
             }}
-            style={{
-              marginTop: spacing.md,
-              padding: `${spacing.sm} ${spacing.lg}`,
-              background: deleting ? colors.neutral[400] : colors.error[500],
-              color: colors.neutral[0],
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: typography.fontSize.sm,
-              fontWeight: typography.fontWeight.semibold,
-              cursor: deleting ? 'not-allowed' : 'pointer',
-            }}
           >
-            {deleting ? 'Deleting account...' : 'Delete my account'}
-          </button>
+            {deleting ? 'Deleting account…' : 'Delete my account'}
+          </Button>
         </div>
       )}
     </div>
   )
 }
+

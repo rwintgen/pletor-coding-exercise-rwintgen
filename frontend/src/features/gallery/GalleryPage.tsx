@@ -3,17 +3,19 @@ import { Link } from 'react-router-dom'
 import type { Image, ListImagesParams } from '../../api/client'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
+import { Fab } from '../../components/Fab'
 import { GalleryToolbar } from '../../components/GalleryToolbar'
 import { ImageCard } from '../../components/ImageCard'
 import { Modal } from '../../components/Modal'
+import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useImages } from '../../hooks/useImages'
 import { useAuthStore } from '../../stores/auth'
-import { colors, radii, shadows, spacing, typography } from '../../theme'
+import { colors, gradients, spacing, typography } from '../../theme'
 import { ImageDetail } from './ImageDetail'
 import { UploadForm } from './UploadForm'
 
-/** Main gallery page: toolbar, image grid, FAB for upload, lightbox. */
+/** Main gallery page: hero, toolbar, image grid, FAB for upload, lightbox. */
 export function GalleryPage() {
   const token = useAuthStore((s) => s.token)
   const [search, setSearch] = useState('')
@@ -40,28 +42,33 @@ export function GalleryPage() {
 
   return (
     <div
+      className="page-enter"
       style={{
         maxWidth: 1280,
         margin: '0 auto',
-        padding: spacing.xl,
+        padding: `${spacing['2xl']} ${spacing.xl}`,
         fontFamily: typography.fontFamily,
       }}
     >
-      <header style={{ textAlign: 'center', marginBottom: spacing['2xl'] }}>
+      <header style={{ textAlign: 'center', marginBottom: spacing['3xl'] }}>
         <h1
           style={{
             margin: 0,
-            fontSize: typography.fontSize['3xl'],
+            fontSize: typography.fontSize['4xl'],
             fontWeight: typography.fontWeight.bold,
-            color: colors.neutral[900],
-            letterSpacing: '-1px',
+            background: gradients.brand,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            letterSpacing: '-0.03em',
+            lineHeight: 1.1,
           }}
         >
           Discover the gallery
         </h1>
         <p
           style={{
-            marginTop: spacing.sm,
+            marginTop: spacing.md,
             color: colors.neutral[600],
             fontSize: typography.fontSize.base,
           }}
@@ -81,11 +88,12 @@ export function GalleryPage() {
 
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: spacing['3xl'] }}>
-          <Spinner size={32} />
+          <Spinner size={36} />
         </div>
       ) : images && images.length > 0 ? (
         <>
           <div
+            className="stagger-fade"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
@@ -102,28 +110,20 @@ export function GalleryPage() {
             ))}
           </div>
           {hasNextPage && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing.xl }}>
-              <button
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: spacing['2xl'] }}>
+              <Button
+                variant="secondary"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                style={{
-                  padding: `${spacing.sm} ${spacing.xl}`,
-                  borderRadius: radii.md,
-                  border: `1px solid ${colors.neutral[300]}`,
-                  background: colors.neutral[0],
-                  fontSize: typography.fontSize.sm,
-                  fontFamily: typography.fontFamily,
-                  cursor: isFetchingNextPage ? 'not-allowed' : 'pointer',
-                  color: colors.neutral[700],
-                }}
               >
-                {isFetchingNextPage ? 'Loading...' : 'Load more'}
-              </button>
+                {isFetchingNextPage ? 'Loading…' : 'Load more'}
+              </Button>
             </div>
           )}
         </>
       ) : (
         <EmptyState
+          icon="📸"
           title="No images yet"
           description={
             token
@@ -132,7 +132,13 @@ export function GalleryPage() {
           }
           action={
             !token && (
-              <Link to="/login" style={{ color: colors.primary[600], fontWeight: 600 }}>
+              <Link
+                to="/login"
+                style={{
+                  color: colors.primary[600],
+                  fontWeight: typography.fontWeight.semibold,
+                }}
+              >
                 Sign in →
               </Link>
             )
@@ -140,36 +146,7 @@ export function GalleryPage() {
         />
       )}
 
-      {token && (
-        <button
-          onClick={() => setShowUpload(true)}
-          aria-label="Upload image"
-          style={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            width: 56,
-            height: 56,
-            borderRadius: radii.xl,
-            background: colors.neutral[900],
-            color: colors.neutral[0],
-            border: 'none',
-            fontSize: '32px',
-            fontWeight: 300,
-            lineHeight: '56px',
-            textAlign: 'center' as const,
-            cursor: 'pointer',
-            boxShadow: shadows.xl,
-            padding: 0,
-            transition: 'transform 150ms ease',
-            zIndex: 40,
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = '' }}
-        >
-          +
-        </button>
-      )}
+      {token && <Fab onClick={() => setShowUpload(true)} />}
 
       <Modal open={showUpload} onClose={() => setShowUpload(false)} maxWidth={480}>
         <div style={{ padding: spacing.xl }}>

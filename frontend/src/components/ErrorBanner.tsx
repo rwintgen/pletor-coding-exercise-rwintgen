@@ -14,12 +14,14 @@ export function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
         color: colors.error[700],
         padding: `${spacing.sm} ${spacing.lg}`,
         borderRadius: radii.md,
+        border: `1px solid ${colors.error[500]}33`,
         fontSize: typography.fontSize.sm,
         fontFamily: typography.fontFamily,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: spacing.md,
+        animation: 'slideDown 250ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <span>{message}</span>

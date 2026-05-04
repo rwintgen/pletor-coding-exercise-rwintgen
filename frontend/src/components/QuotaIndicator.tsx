@@ -1,11 +1,11 @@
 import { QuotaStatus } from '../api/client'
-import { colors, radii, spacing, typography } from '../theme'
+import { colors, radii, spacing, transitions, typography } from '../theme'
 
 interface QuotaIndicatorProps {
   quota: QuotaStatus
 }
 
-/** Visual progress bar showing daily user upload quota with color thresholds. */
+/** Visual progress bar showing daily user upload quota with smooth color thresholds. */
 export function QuotaIndicator({ quota }: QuotaIndicatorProps) {
   const percent = Math.min(
     100,
@@ -14,10 +14,10 @@ export function QuotaIndicator({ quota }: QuotaIndicatorProps) {
 
   const barColor =
     percent >= 100
-      ? colors.error[500]
+      ? `linear-gradient(90deg, ${colors.error[500]}, ${colors.error[600]})`
       : percent >= 80
-        ? colors.warning[500]
-        : colors.success[500]
+        ? `linear-gradient(90deg, ${colors.warning[500]}, ${colors.error[500]})`
+        : `linear-gradient(90deg, ${colors.primary[500]}, ${colors.accent[500]})`
 
   return (
     <div style={{ fontFamily: typography.fontFamily }}>
@@ -28,17 +28,18 @@ export function QuotaIndicator({ quota }: QuotaIndicatorProps) {
           fontSize: typography.fontSize.xs,
           color: colors.neutral[600],
           marginBottom: spacing.xs,
+          fontWeight: typography.fontWeight.medium,
         }}
       >
         <span>Daily uploads</span>
-        <span>
+        <span style={{ color: colors.neutral[800] }}>
           {quota.user_uploads_today} / {quota.user_limit}
         </span>
       </div>
       <div
         style={{
-          height: 6,
-          background: colors.neutral[200],
+          height: 8,
+          background: colors.neutral[150],
           borderRadius: radii.full,
           overflow: 'hidden',
         }}
@@ -48,7 +49,8 @@ export function QuotaIndicator({ quota }: QuotaIndicatorProps) {
             width: `${percent}%`,
             height: '100%',
             background: barColor,
-            transition: 'width 250ms ease',
+            borderRadius: radii.full,
+            transition: `width ${transitions.slow}, background ${transitions.normal}`,
           }}
         />
       </div>

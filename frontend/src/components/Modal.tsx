@@ -9,7 +9,7 @@ interface ModalProps {
   maxWidth?: number
 }
 
-/** Centered modal overlay. Closes on backdrop click or Escape. */
+/** Centered modal overlay with glass backdrop. Closes on backdrop click or Escape. */
 export function Modal({ open, onClose, children, maxWidth = 800 }: ModalProps) {
   useEffect(() => {
     if (!open) return
@@ -30,27 +30,28 @@ export function Modal({ open, onClose, children, maxWidth = 800 }: ModalProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.6)',
-        backdropFilter: 'blur(4px)',
+        background: 'rgba(9,9,11,0.55)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000,
         padding: spacing.lg,
-        animation: 'fadeIn 150ms ease',
+        animation: 'fadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
           background: colors.neutral[0],
-          borderRadius: radii.xl,
+          borderRadius: radii['2xl'],
           boxShadow: shadows.xl,
           maxWidth,
           width: '100%',
           maxHeight: '90vh',
           overflow: 'auto',
-          animation: 'scaleIn 200ms ease',
+          animation: 'scaleIn 280ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {children}

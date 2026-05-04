@@ -1,20 +1,42 @@
 export const colors = {
-  primary: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb' },
+  primary: {
+    50: '#eef2ff',
+    100: '#e0e7ff',
+    400: '#818cf8',
+    500: '#6366f1',
+    600: '#4f46e5',
+    700: '#4338ca',
+  },
+  accent: {
+    400: '#f472b6',
+    500: '#ec4899',
+    600: '#db2777',
+  },
   neutral: {
     0: '#ffffff',
     50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e5e5e5',
-    300: '#d4d4d4',
-    500: '#737373',
-    600: '#525252',
-    700: '#404040',
-    800: '#262626',
-    900: '#171717',
+    100: '#f4f4f5',
+    150: '#ececef',
+    200: '#e4e4e7',
+    300: '#d4d4d8',
+    400: '#a1a1aa',
+    500: '#71717a',
+    600: '#52525b',
+    700: '#3f3f46',
+    800: '#27272a',
+    900: '#18181b',
+    950: '#09090b',
   },
-  success: { 500: '#22c55e' },
-  warning: { 500: '#f59e0b' },
-  error: { 50: '#fef2f2', 500: '#ef4444', 700: '#b91c1c' },
+  success: { 50: '#ecfdf5', 500: '#10b981', 700: '#047857' },
+  warning: { 50: '#fffbeb', 500: '#f59e0b', 700: '#b45309' },
+  error: { 50: '#fef2f2', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' },
+} as const
+
+export const gradients = {
+  brand: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+  brandSubtle: 'linear-gradient(135deg, #eef2ff 0%, #fae8ff 100%)',
+  surface: 'linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%)',
+  hero: 'radial-gradient(circle at 20% 0%, rgba(99,102,241,0.08), transparent 50%), radial-gradient(circle at 80% 100%, rgba(236,72,153,0.06), transparent 50%)',
 } as const
 
 export const spacing = {
@@ -25,6 +47,7 @@ export const spacing = {
   xl: '24px',
   '2xl': '32px',
   '3xl': '48px',
+  '4xl': '72px',
 } as const
 
 export const typography = {
@@ -37,24 +60,34 @@ export const typography = {
     xl: '1.25rem',
     '2xl': '1.5rem',
     '3xl': '1.875rem',
+    '4xl': '2.5rem',
   },
   fontWeight: { medium: 500, semibold: 600, bold: 700 },
 } as const
 
 export const radii = {
-  md: '8px',
-  lg: '12px',
-  xl: '16px',
+  sm: '6px',
+  md: '10px',
+  lg: '14px',
+  xl: '18px',
+  '2xl': '24px',
   full: '9999px',
 } as const
 
 export const shadows = {
-  sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-  md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-  xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+  xs: '0 1px 2px rgba(24,24,27,0.04)',
+  sm: '0 1px 3px rgba(24,24,27,0.06), 0 1px 2px rgba(24,24,27,0.04)',
+  md: '0 4px 12px -2px rgba(24,24,27,0.08), 0 2px 6px -2px rgba(24,24,27,0.04)',
+  lg: '0 12px 28px -8px rgba(24,24,27,0.12), 0 4px 10px -4px rgba(24,24,27,0.06)',
+  xl: '0 24px 50px -12px rgba(24,24,27,0.18), 0 8px 16px -8px rgba(24,24,27,0.08)',
+  glow: '0 0 0 4px rgba(99,102,241,0.18)',
+  glowAccent: '0 0 0 4px rgba(236,72,153,0.18)',
+  brand: '0 10px 30px -10px rgba(99,102,241,0.45)',
 } as const
 
 export const transitions = {
-  fast: '150ms ease',
-  normal: '250ms ease',
+  fast: '150ms cubic-bezier(0.16, 1, 0.3, 1)',
+  normal: '250ms cubic-bezier(0.16, 1, 0.3, 1)',
+  slow: '450ms cubic-bezier(0.16, 1, 0.3, 1)',
 } as const
+

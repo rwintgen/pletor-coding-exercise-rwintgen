@@ -11,6 +11,7 @@ interface DropZoneProps {
 export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [hover, setHover] = useState(false)
 
   const accept = (file: File | undefined) => {
     if (!file) return
@@ -18,9 +19,13 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
     onFile(file)
   }
 
+  const active = isDragging || hover
+
   return (
     <div
       onClick={() => !disabled && inputRef.current?.click()}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       onDragOver={(e) => {
         e.preventDefault()
         if (!disabled) setIsDragging(true)
@@ -35,13 +40,14 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
         if (!disabled) accept(e.dataTransfer.files[0])
       }}
       style={{
-        border: `2px dashed ${isDragging ? colors.primary[500] : colors.neutral[300]}`,
+        border: `2px dashed ${isDragging ? colors.primary[500] : active ? colors.primary[400] : colors.neutral[200]}`,
         borderRadius: radii.lg,
         padding: spacing['2xl'],
         textAlign: 'center',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        background: isDragging ? colors.primary[50] : colors.neutral[50],
-        transition: `all ${transitions.normal}`,
+        background: isDragging ? colors.primary[50] : active ? colors.neutral[50] : colors.neutral[0],
+        transition: `border-color ${transitions.fast}, background ${transitions.fast}, transform ${transitions.fast}`,
+        transform: isDragging ? 'scale(1.01)' : 'scale(1)',
         opacity: disabled ? 0.5 : 1,
         fontFamily: typography.fontFamily,
       }}
@@ -60,7 +66,8 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
             style={{
               margin: 0,
               color: colors.neutral[800],
-              fontWeight: typography.fontWeight.medium,
+              fontWeight: typography.fontWeight.semibold,
+              fontSize: typography.fontSize.sm,
             }}
           >
             {selectedFile.name}
@@ -77,14 +84,25 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
         </div>
       ) : (
         <div>
+          <div
+            style={{
+              fontSize: 28,
+              marginBottom: spacing.sm,
+              transition: `transform ${transitions.normal}`,
+              transform: isDragging ? 'translateY(-4px)' : 'none',
+            }}
+          >
+            📁
+          </div>
           <p
             style={{
               margin: 0,
-              color: colors.neutral[700],
-              fontWeight: typography.fontWeight.medium,
+              color: colors.neutral[800],
+              fontWeight: typography.fontWeight.semibold,
+              fontSize: typography.fontSize.sm,
             }}
           >
-            Drag &amp; drop an image
+            Drop an image here
           </p>
           <p
             style={{

@@ -61,16 +61,28 @@ export function UploadForm({ onSuccess }: UploadFormProps) {
         fontFamily: typography.fontFamily,
       }}
     >
-      <h2
-        style={{
-          margin: 0,
-          fontSize: typography.fontSize.lg,
-          fontWeight: typography.fontWeight.semibold,
-          color: colors.neutral[900],
-        }}
-      >
-        Upload a new image
-      </h2>
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: typography.fontSize.xl,
+            fontWeight: typography.fontWeight.bold,
+            color: colors.neutral[900],
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Upload a new image
+        </h2>
+        <p
+          style={{
+            margin: `${spacing.xs} 0 0`,
+            fontSize: typography.fontSize.sm,
+            color: colors.neutral[500],
+          }}
+        >
+          JPEG, PNG, GIF or WebP · max 10 per day
+        </p>
+      </div>
 
       <Input
         label="Title"

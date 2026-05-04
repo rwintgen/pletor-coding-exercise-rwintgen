@@ -93,22 +93,25 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: spacing.xl,
-        background: colors.neutral[50],
+        background:
+          'radial-gradient(circle at 20% 0%, rgba(99,102,241,0.12), transparent 45%), radial-gradient(circle at 80% 100%, rgba(236,72,153,0.10), transparent 45%), #fafafa',
       }}
     >
       <div
+        className="page-enter"
         style={{
           width: '100%',
-          maxWidth: 400,
+          maxWidth: 420,
           background: colors.neutral[0],
-          borderRadius: 16,
+          borderRadius: 20,
           padding: spacing['2xl'],
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+          boxShadow: '0 24px 50px -12px rgba(24,24,27,0.18), 0 8px 16px -8px rgba(24,24,27,0.06)',
+          border: `1px solid ${colors.neutral[150]}`,
         }}
       >
         <h1
@@ -118,6 +121,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
             fontWeight: typography.fontWeight.bold,
             color: colors.neutral[900],
             fontFamily: typography.fontFamily,
+            letterSpacing: '-0.02em',
           }}
         >
           {title}
@@ -128,7 +132,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
               marginTop: spacing.sm,
               marginBottom: spacing.xl,
               fontSize: typography.fontSize.sm,
-              color: colors.neutral[600],
+              color: colors.neutral[500],
               fontFamily: typography.fontFamily,
             }}
           >

@@ -1,14 +1,21 @@
-import { InputHTMLAttributes, forwardRef } from 'react'
-import { colors, radii, spacing, typography } from '../../theme'
+import { InputHTMLAttributes, forwardRef, useState } from 'react'
+import { colors, radii, shadows, spacing, transitions, typography } from '../../theme'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
 }
 
-/** Themed text input with optional label and inline error message. */
+/** Themed text input with optional label, animated focus ring, and inline error message. */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, style, ...rest }, ref) => {
+  ({ label, error, style, onFocus, onBlur, ...rest }, ref) => {
+    const [focused, setFocused] = useState(false)
+    const borderColor = error
+      ? colors.error[500]
+      : focused
+        ? colors.primary[500]
+        : colors.neutral[200]
+    const ring = focused && !error ? shadows.glow : error ? '0 0 0 4px rgba(239,68,68,0.15)' : 'none'
     return (
       <label
         style={{
@@ -25,13 +32,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...rest}
+          onFocus={(e) => {
+            setFocused(true)
+            onFocus?.(e)
+          }}
+          onBlur={(e) => {
+            setFocused(false)
+            onBlur?.(e)
+          }}
           style={{
-            padding: spacing.sm,
+            padding: `${spacing.sm} ${spacing.md}`,
+            height: 44,
+            background: colors.neutral[0],
             borderRadius: radii.md,
-            border: `1px solid ${error ? colors.error[500] : colors.neutral[300]}`,
-            fontSize: typography.fontSize.base,
+            border: `1px solid ${borderColor}`,
+            boxShadow: ring,
+            fontSize: typography.fontSize.sm,
             fontFamily: typography.fontFamily,
+            color: colors.neutral[900],
             outline: 'none',
+            transition: `border-color ${transitions.fast}, box-shadow ${transitions.fast}`,
             ...style,
           }}
         />
