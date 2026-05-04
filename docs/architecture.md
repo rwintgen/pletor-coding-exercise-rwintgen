@@ -32,21 +32,40 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 1. User registers with username + password
 2. Password hashed with bcrypt, stored in users table
 3. Login returns JWT access token (24h expiry)
-4. Frontend stores token in zustand store (+ localStorage)
+4. Frontend stores token in Zustand store (persisted to localStorage via `zustand/middleware`)
 5. All mutating requests include Authorization: Bearer header
 6. Backend `get_current_user` dependency validates token and injects user
+7. On reload, `App.tsx` calls `/auth/me`; on 401 the auth store is cleared
 
 ## Frontend
 
-- **api/**: HTTP client (fetch-based), endpoint functions, response types
-- **components/ui/**: Reusable Shadcn/Radix primitives
-- **components/**: Shared composed components (ImageCard, DropZone, QuotaIndicator, etc.)
-- **features/auth/**: Login/Register forms, auth state management
-- **features/gallery/**: Gallery grid, image detail, empty/loading states
-- **features/upload/**: Upload form, drag-and-drop, batch upload, progress
-- **hooks/**: Shared hooks (useAuth, useImages, useQuota)
-- **stores/**: Zustand stores for client-side state (auth token, UI state)
-- **lib/**: Zod schemas, utility functions, constants
+- **api/client.ts**: fetch-based HTTP client; reads JWT from auth store
+- **stores/auth.ts**: Zustand store with `persist` middleware (token + user persisted to localStorage)
+- **lib/schemas.ts**: Zod validation schemas (login, register, upload)
+- **lib/queryClient.ts**: TanStack Query client singleton
+- **hooks/useImages.ts**: `useImages`, `useUploadImage`, `useDeleteImage` query/mutation hooks
+- **hooks/useQuota.ts**: `useQuota` query hook (skipped when unauthenticated)
+- **components/ui/**: primitives (`Button`, `Input`, `Card`, `Spinner`)
+- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `Modal`, `EmptyState`, `ErrorBanner`)
+- **features/auth/**: `LoginPage`, `RegisterPage`, shared `AuthShell`
+- **features/gallery/**: `GalleryPage`, `UploadForm`, `ImageDetail` (lightbox)
+- **theme.ts**: design tokens (colors, spacing, typography, radii, shadows, transitions)
+- **App.tsx**: `BrowserRouter` with routes `/`, `/login`, `/register`; revalidates persisted token via `/auth/me` on mount
+
+### Routing
+
+| Path | Behavior |
+|------|----------|
+| `/` | Public gallery; upload panel shown only when authenticated |
+| `/login` | Redirects to `/` if already authenticated |
+| `/register` | Redirects to `/` if already authenticated |
+| `*` | Redirects to `/` |
+
+### State boundaries
+
+- **Server state** → TanStack Query (images, quota). Mutations invalidate the relevant queries.
+- **Auth state** → Zustand (token, user). Persisted via `zustand/middleware` `persist` under key `auth`.
+- **Local UI state** → component `useState` (form fields, modal open, drag-over).
 
 ## Quota System
 

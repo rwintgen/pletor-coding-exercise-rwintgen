@@ -40,14 +40,11 @@ export interface UserInfo {
 export const getImageUrl = (url: string): string =>
   url.startsWith('http') ? url : `${API_URL}${url}`
 
-/** Returns the stored auth token or null */
-function getToken(): string | null {
-  return localStorage.getItem('token')
-}
+import { useAuthStore } from '../stores/auth'
 
-/** Builds auth headers if a token is present */
+/** Builds auth headers if a token is present in the auth store */
 function authHeaders(): Record<string, string> {
-  const token = getToken()
+  const token = useAuthStore.getState().token
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
@@ -107,7 +104,7 @@ export async function register(username: string, password: string): Promise<User
   return res.json()
 }
 
-/** Logs in and stores the JWT token */
+/** Logs in; returns the token response. Caller is responsible for storing it. */
 export async function login(username: string, password: string): Promise<TokenResponse> {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
@@ -118,9 +115,7 @@ export async function login(username: string, password: string): Promise<TokenRe
     const data = await res.json().catch(() => ({}))
     throw new Error(data.detail || 'Login failed')
   }
-  const data: TokenResponse = await res.json()
-  localStorage.setItem('token', data.access_token)
-  return data
+  return res.json()
 }
 
 /** Fetches current user info (requires auth) */
@@ -132,7 +127,3 @@ export async function getMe(): Promise<UserInfo> {
   return res.json()
 }
 
-/** Removes the stored token */
-export function logout(): void {
-  localStorage.removeItem('token')
-}

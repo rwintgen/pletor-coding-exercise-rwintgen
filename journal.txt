@@ -74,3 +74,20 @@
 - Added 4 new tests: empty username, empty password, upload missing title, delete frees quota slot
 - Total: 31 tests, all passing
 - Docs verified accurate
+- Commit: `45dcb71` — refactor: deep audit — theme tokens, validation, and 4 new tests
+
+### Phase 3 + 4 — Frontend auth & polished gallery
+- Installed `zustand`, `@tanstack/react-query`, `react-router-dom`, `zod`
+- `stores/auth.ts`: Zustand store with `persist` middleware (token + user)
+- Updated `api/client.ts` to read token from auth store; `login()` no longer touches localStorage directly
+- `lib/schemas.ts`: Zod schemas for login, register, upload
+- `lib/queryClient.ts`: TanStack Query client (30s staleTime, no refetch-on-focus)
+- `hooks/useImages.ts`, `hooks/useQuota.ts`: query + mutation hooks; mutations invalidate cache
+- UI primitives: `Button` (4 variants × 3 sizes), `Input` (label+error), `Card` (hover-lift), `Spinner`
+- Composed components: `Navbar`, `ImageCard` (owner-only delete, hover zoom), `DropZone`, `QuotaIndicator` (color-coded progress), `Modal` (Escape + backdrop close), `EmptyState`, `ErrorBanner`
+- Pages: `LoginPage` + `RegisterPage` (shared `AuthShell`), `GalleryPage` (sidebar upload + grid), `UploadForm`, `ImageDetail` (lightbox)
+- `App.tsx`: react-router with `/`, `/login`, `/register`; revalidates persisted token via `/auth/me` on mount; clears auth on 401
+- `index.css`: keyframes (spin, fadeIn, scaleIn) + base resets
+- Removed legacy `App.css` and old monolithic `App.tsx`
+- Build + lint clean (351 KB JS, 108 KB gzipped)
+- Skipped Shadcn/Radix to keep things simple per company guidance ("simplicité et efficacité")
