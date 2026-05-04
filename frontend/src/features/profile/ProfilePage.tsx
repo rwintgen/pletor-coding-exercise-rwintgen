@@ -6,11 +6,13 @@ import { deleteAccount, getUserProfile } from '../../api/client'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { ImageCard } from '../../components/ImageCard'
+import { Modal } from '../../components/Modal'
 import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useUserImages } from '../../hooks/useImages'
 import { useAuthStore } from '../../stores/auth'
-import { colors, spacing, typography } from '../../theme'
+import { colors, radii, shadows, spacing, typography } from '../../theme'
 import { ImageDetail } from '../gallery/ImageDetail'
+import { UploadForm } from '../gallery/UploadForm'
 
 /** User profile page. Shows user info + their uploaded images. */
 export function ProfilePage() {
@@ -20,6 +22,7 @@ export function ProfilePage() {
   const isOwnProfile = currentUser?.username === username
   const [active, setActive] = useState<Image | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [showUpload, setShowUpload] = useState(false)
   const navigate = useNavigate()
 
   const {
@@ -123,6 +126,43 @@ export function ProfilePage() {
       )}
 
       <ImageDetail image={active} onClose={() => setActive(null)} />
+
+      {isOwnProfile && (
+        <button
+          onClick={() => setShowUpload(true)}
+          aria-label="Upload image"
+          style={{
+            position: 'fixed',
+            bottom: 32,
+            right: 32,
+            width: 56,
+            height: 56,
+            borderRadius: radii.xl,
+            background: colors.neutral[900],
+            color: colors.neutral[0],
+            border: 'none',
+            fontSize: '32px',
+            fontWeight: 300,
+            lineHeight: '56px',
+            textAlign: 'center' as const,
+            cursor: 'pointer',
+            boxShadow: shadows.xl,
+            padding: 0,
+            transition: 'transform 150ms ease',
+            zIndex: 40,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = '' }}
+        >
+          +
+        </button>
+      )}
+
+      <Modal open={showUpload} onClose={() => setShowUpload(false)} maxWidth={480}>
+        <div style={{ padding: spacing.xl }}>
+          <UploadForm onSuccess={() => setShowUpload(false)} />
+        </div>
+      </Modal>
 
       {isOwnProfile && (
         <div

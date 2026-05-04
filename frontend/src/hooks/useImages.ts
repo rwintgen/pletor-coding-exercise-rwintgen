@@ -28,6 +28,7 @@ export function useUploadImage() {
     mutationFn: (form: FormData) => uploadImage(form),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['images'] })
+      qc.invalidateQueries({ queryKey: ['userImages'] })
       qc.invalidateQueries({ queryKey: ['quota'] })
     },
   })
@@ -40,6 +41,7 @@ export function useDeleteImage() {
     mutationFn: (id: number) => deleteImage(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['images'] })
+      qc.invalidateQueries({ queryKey: ['userImages'] })
       qc.invalidateQueries({ queryKey: ['quota'] })
     },
   })
