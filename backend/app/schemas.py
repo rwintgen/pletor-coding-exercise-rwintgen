@@ -32,3 +32,13 @@ class ImageRead(BaseModel):
     content_type: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class QuotaStatus(BaseModel):
+    user_uploads_today: int
+    user_limit: int
+    user_remaining: int
+    global_uploads_today: int
+    global_limit: int
+    global_remaining: int
+    can_upload: bool

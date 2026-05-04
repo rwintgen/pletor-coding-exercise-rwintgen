@@ -48,9 +48,20 @@
 - Wrote 19 pytest tests (auth + images endpoints + edge cases)
 - All pass against in-memory SQLite
 
+### Phase 2 — Upload Quotas
+- Created `services/quota.py`: per-user (10/day) and global (100/day) limits
+- `enforce_quota()` checks counts via `SELECT COUNT` filtered by today's start (UTC midnight)
+- Returns 429 with clear message when limit hit
+- Added `GET /images/quota` endpoint returning full status (remaining, limits, can_upload)
+- Quota checked before file write (fail-fast)
+- Race conditions: SQLite serializes writes inherently; noted Postgres strategy in docs
+- 8 new tests: unauthenticated, fresh user, decrement, user exceeded, status reflects exceeded, global exceeded (patched limit), independent per-user, midnight reset
+- All 27 tests pass
+- Commit:
+
 ### Restructure docs
 - Split monolithic architecture.md into 3 files:
   - docs/README.md — how to run, test, format
   - docs/architecture.md — system design, API endpoints, auth flow
   - docs/schema.md — DB tables, relationships, seed data
-- Commit: 
+- Commit: `36421a5` — docs: split docs into README, architecture, and schema files; add tests

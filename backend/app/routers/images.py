@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth import get_current_user
 from app.db import get_db
 from app.models import Image, User
-from app.schemas import ImageRead
+from app.schemas import ImageRead, QuotaStatus
+from app.services.quota import QuotaExceededError, check_quota, enforce_quota
 
 router = APIRouter(prefix="/images", tags=["images"])
 
@@ -38,6 +39,11 @@ async def upload_image(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    try:
+        await enforce_quota(db, current_user.id)
+    except QuotaExceededError as e:
+        raise HTTPException(status_code=429, detail=e.message)
+
     if file.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400,
@@ -72,6 +78,14 @@ async def list_images(db: AsyncSession = Depends(get_db)):
         .order_by(Image.created_at.desc())
     )
     return [_image_to_response(row.Image, row.username) for row in result.all()]
+
+
+@router.get("/quota", response_model=QuotaStatus)
+async def get_quota(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await check_quota(db, current_user.id)
 
 
 @router.get("/{image_id}", response_model=ImageRead)

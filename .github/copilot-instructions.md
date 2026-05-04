@@ -5,6 +5,7 @@
 - Do NOT commit unless asked.
 - Commits use conventional prefixes: `feat:`, `fix:`, `refactor:`, `docs:`, `style:`, `test:`, `chore:`.
 - Read `/docs` before proposing changes. Update docs when logic changes.
+- Create tests in `/backend/tests` whenever developing a new feature.
 - Ask for clarification whenever in doubt.
 
 ## Code

@@ -4,8 +4,12 @@ import pytest
 
 
 async def register_and_login(client, username="user1", password="pass"):
-    await client.post("/auth/register", json={"username": username, "password": password})
-    res = await client.post("/auth/login", json={"username": username, "password": password})
+    await client.post(
+        "/auth/register", json={"username": username, "password": password}
+    )
+    res = await client.post(
+        "/auth/login", json={"username": username, "password": password}
+    )
     return res.json()["access_token"]
 
 
@@ -14,12 +18,17 @@ def auth_header(token):
 
 
 def fake_image(filename="test.png", content_type="image/png"):
-    return ("file", (filename, io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100), content_type))
+    return (
+        "file",
+        (filename, io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100), content_type),
+    )
 
 
 @pytest.mark.asyncio
 async def test_upload_requires_auth(client):
-    res = await client.post("/images/upload", data={"title": "pic"}, files=[fake_image()])
+    res = await client.post(
+        "/images/upload", data={"title": "pic"}, files=[fake_image()]
+    )
     assert res.status_code == 401
 
 

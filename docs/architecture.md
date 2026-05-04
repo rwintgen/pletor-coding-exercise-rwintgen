@@ -22,8 +22,9 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 | POST | /auth/login | No | Returns JWT access_token |
 | GET | /auth/me | Yes | Returns current user |
 | GET | /images/ | No | List all images (newest first) |
+| GET | /images/quota | Yes | Returns quota status (user + global) |
 | GET | /images/{id} | No | Get single image |
-| POST | /images/upload | Yes | Upload image (multipart: title + file) |
+| POST | /images/upload | Yes | Upload image (429 if quota exceeded) |
 | DELETE | /images/{id} | Yes | Delete image (owner only, 403 otherwise) |
 
 ## Auth Flow
@@ -47,9 +48,10 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 - **stores/**: Zustand stores for client-side state (auth token, UI state)
 - **lib/**: Zod schemas, utility functions, constants
 
-## Quota System (not yet implemented)
+## Quota System
 
-- Per-user: 10 uploads/day (resets at midnight UTC)
-- Global: 100 uploads/day across all users
-- Enforced at service layer with atomic DB count queries
-- Race conditions handled via DB-level constraints and transaction isolation
+- Per-user: 10 uploads/day, global: 100 uploads/day (resets at midnight UTC)
+- Enforced in `services/quota.py` via COUNT queries filtered by `created_at >= today_start`
+- `enforce_quota()` called before file write — fails fast with 429
+- `GET /images/quota` returns remaining counts so frontend can show approaching/hit/recovered states
+- Race conditions: SQLite serializes writes; for Postgres, use `SELECT ... FOR UPDATE` or advisory locks
