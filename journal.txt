@@ -57,7 +57,7 @@
 - Race conditions: SQLite serializes writes inherently; noted Postgres strategy in docs
 - 8 new tests: unauthenticated, fresh user, decrement, user exceeded, status reflects exceeded, global exceeded (patched limit), independent per-user, midnight reset
 - All 27 tests pass
-- Commit:
+- Commit: `084230b` — feat: implement upload quotas (10/user/day, 100 global/day) with status endpoint and tests
 
 ### Restructure docs
 - Split monolithic architecture.md into 3 files:
@@ -65,3 +65,12 @@
   - docs/architecture.md — system design, API endpoints, auth flow
   - docs/schema.md — DB tables, relationships, seed data
 - Commit: `36421a5` — docs: split docs into README, architecture, and schema files; add tests
+
+### Deep Audit
+- App.tsx: replaced all hardcoded inline styles with theme.ts tokens (colors, spacing, typography, radii, shadows, transitions)
+- App.tsx: removed stale `user` state + form field, fixed `img.user` → `img.username`
+- api/client.ts: already had JSDoc from earlier pass
+- schemas.py: added `min_length=1` validation on username and password
+- Added 4 new tests: empty username, empty password, upload missing title, delete frees quota slot
+- Total: 31 tests, all passing
+- Docs verified accurate

@@ -159,3 +159,14 @@ async def test_delete_nonexistent_image(client):
     token = await register_and_login(client)
     res = await client.delete("/images/9999", headers=auth_header(token))
     assert res.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_upload_missing_title(client):
+    token = await register_and_login(client)
+    res = await client.post(
+        "/images/upload",
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    assert res.status_code == 422

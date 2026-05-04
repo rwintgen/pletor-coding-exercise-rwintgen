@@ -7,13 +7,13 @@ import {
   listImages,
   uploadImage,
 } from './api/client'
+import { colors, spacing, typography, radii, shadows, transitions } from './theme'
 
 function App() {
   const [images, setImages] = useState<Image[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [title, setTitle] = useState('')
-  const [user, setUser] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -69,10 +69,8 @@ function App() {
       const formData = new FormData()
       formData.append('file', selectedFile)
       formData.append('title', title)
-      formData.append('user', user)
       await uploadImage(formData)
       setTitle('')
-      setUser('')
       setSelectedFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
       fetchImages()
@@ -94,19 +92,14 @@ function App() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2rem auto', fontFamily: 'Inter, sans-serif' }}>
-      <h1 style={{ textAlign: 'center', fontSize: '3rem', fontWeight: 700, marginBottom: 40, letterSpacing: '-2px', color: '#222' }}>Image Gallery</h1>
+    <div style={{ maxWidth: 1200, margin: `${spacing['2xl']} auto`, fontFamily: typography.fontFamily }}>
+      <h1 style={{ textAlign: 'center', fontSize: typography.fontSize['3xl'], fontWeight: typography.fontWeight.bold, marginBottom: spacing['3xl'], letterSpacing: '-1px', color: colors.neutral[900] }}>Image Gallery</h1>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 40, maxWidth: 600, margin: '0 auto 40px auto' }}>
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: spacing['3xl'], maxWidth: 600, margin: `0 auto ${spacing['3xl']} auto` }}>
+        <div style={{ display: 'flex', gap: spacing.md, marginBottom: spacing.lg }}>
           <div style={{ flex: 1 }}>
-            <label style={{ fontWeight: 500, color: '#333', fontSize: 14 }}>Title<br />
-              <input value={title} onChange={(e) => setTitle(e.target.value)} required style={{ padding: 8, borderRadius: 6, border: '1px solid #bbb', width: '100%', boxSizing: 'border-box' }} />
-            </label>
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontWeight: 500, color: '#333', fontSize: 14 }}>User<br />
-              <input value={user} onChange={(e) => setUser(e.target.value)} required style={{ padding: 8, borderRadius: 6, border: '1px solid #bbb', width: '100%', boxSizing: 'border-box' }} />
+            <label style={{ fontWeight: typography.fontWeight.medium, color: colors.neutral[700], fontSize: typography.fontSize.sm }}>Title<br />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} required style={{ padding: spacing.sm, borderRadius: radii.md, border: `1px solid ${colors.neutral[300]}`, width: '100%', boxSizing: 'border-box' }} />
             </label>
           </div>
         </div>
@@ -117,14 +110,14 @@ function App() {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           style={{
-            border: `2px dashed ${isDragging ? '#0077cc' : '#ccc'}`,
-            borderRadius: 12,
-            padding: '2rem',
+            border: `2px dashed ${isDragging ? colors.primary[500] : colors.neutral[300]}`,
+            borderRadius: radii.lg,
+            padding: spacing['2xl'],
             textAlign: 'center',
             cursor: 'pointer',
-            background: isDragging ? '#f0f7ff' : '#fafafa',
-            marginBottom: 16,
-            transition: 'all 0.2s',
+            background: isDragging ? colors.primary[50] : colors.neutral[50],
+            marginBottom: spacing.lg,
+            transition: `all ${transitions.normal}`,
           }}
         >
           <input
@@ -138,38 +131,38 @@ function App() {
             style={{ display: 'none' }}
           />
           {selectedFile ? (
-            <p style={{ margin: 0, color: '#333', fontWeight: 500 }}>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</p>
+            <p style={{ margin: 0, color: colors.neutral[700], fontWeight: typography.fontWeight.medium }}>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</p>
           ) : (
-            <p style={{ margin: 0, color: '#888' }}>Drag & drop an image here, or click to select</p>
+            <p style={{ margin: 0, color: colors.neutral[400] }}>Drag & drop an image here, or click to select</p>
           )}
         </div>
 
-        <button type="submit" disabled={submitting} style={{ width: '100%', padding: '12px 22px', borderRadius: 8, background: '#222', color: 'white', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px #0001', transition: 'background 0.2s' }}>
+        <button type="submit" disabled={submitting} style={{ width: '100%', padding: `${spacing.md} ${spacing.xl}`, borderRadius: radii.md, background: colors.neutral[900], color: colors.neutral[0], fontWeight: typography.fontWeight.semibold, border: 'none', cursor: 'pointer', fontSize: typography.fontSize.base, boxShadow: shadows.sm, transition: `background ${transitions.normal}` }}>
           {submitting ? 'Uploading...' : 'Upload Image'}
         </button>
       </form>
 
-      {error && <p style={{ color: '#e74c3c', textAlign: 'center', padding: '8px 16px', background: '#fdf0ef', borderRadius: 8, maxWidth: 600, margin: '0 auto 24px auto' }}>{error}</p>}
-      {loading && <p style={{ textAlign: 'center', color: '#888' }}>Loading...</p>}
+      {error && <p style={{ color: colors.error[700], textAlign: 'center', padding: `${spacing.sm} ${spacing.lg}`, background: colors.error[50], borderRadius: radii.md, maxWidth: 600, margin: `0 auto ${spacing.xl} auto` }}>{error}</p>}
+      {loading && <p style={{ textAlign: 'center', color: colors.neutral[400] }}>Loading...</p>}
 
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '1.5rem',
+        gap: spacing.xl,
         alignItems: 'stretch',
       }}>
-        {images.length === 0 && !loading && <p style={{ textAlign: 'center', gridColumn: '1/-1', color: '#888' }}>No images found.</p>}
+        {images.length === 0 && !loading && <p style={{ textAlign: 'center', gridColumn: '1/-1', color: colors.neutral[400] }}>No images found.</p>}
         {images.map((img) => (
-          <div key={img.id} style={{ boxShadow: '0 4px 24px #0002', borderRadius: 16, padding: 0, background: '#fff', overflow: 'hidden', border: '1px solid #eee', transition: 'box-shadow 0.2s', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-            <img src={getImageUrl(img.url)} alt={img.title} style={{ width: '100%', display: 'block', objectFit: 'cover', height: 220, background: '#eee' }} />
-            <div style={{ padding: 16, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div key={img.id} style={{ boxShadow: shadows.lg, borderRadius: radii.xl, padding: 0, background: colors.neutral[0], overflow: 'hidden', border: `1px solid ${colors.neutral[200]}`, transition: `box-shadow ${transitions.normal}`, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+            <img src={getImageUrl(img.url)} alt={img.title} style={{ width: '100%', display: 'block', objectFit: 'cover', height: 220, background: colors.neutral[200] }} />
+            <div style={{ padding: spacing.lg, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#222' }}>{img.title}</h2>
-                <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: 14 }}>by <span style={{ color: '#0077cc' }}>{img.user}</span></p>
-                <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#999' }}>{new Date(img.created_at).toLocaleString()}</p>
+                <h2 style={{ margin: 0, fontSize: typography.fontSize.lg, fontWeight: typography.fontWeight.bold, color: colors.neutral[900] }}>{img.title}</h2>
+                <p style={{ margin: `${spacing.xs} 0 0 0`, color: colors.neutral[600], fontSize: typography.fontSize.sm }}>by <span style={{ color: colors.primary[600] }}>{img.username}</span></p>
+                <p style={{ margin: `${spacing.xs} 0 0 0`, fontSize: typography.fontSize.xs, color: colors.neutral[400] }}>{new Date(img.created_at).toLocaleString()}</p>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-                <button onClick={() => handleDelete(img.id)} style={{ background: '#e74c3c', color: 'white', border: 'none', borderRadius: 6, padding: '6px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Delete</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: spacing.md }}>
+                <button onClick={() => handleDelete(img.id)} style={{ background: colors.error[500], color: colors.neutral[0], border: 'none', borderRadius: radii.sm, padding: `${spacing.xs} ${spacing.lg}`, cursor: 'pointer', fontWeight: typography.fontWeight.semibold, fontSize: typography.fontSize.sm }}>Delete</button>
               </div>
             </div>
           </div>

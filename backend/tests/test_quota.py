@@ -155,6 +155,27 @@ async def test_user_quota_independent_per_user(client):
 
 
 @pytest.mark.asyncio
+async def test_delete_frees_quota_slot(client):
+    """Deleting an image frees the quota slot (count is based on existing images today)."""
+    token = await register_and_login(client)
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "temp"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    image_id = upload.json()["id"]
+
+    res = await client.get("/images/quota", headers=auth_header(token))
+    assert res.json()["user_uploads_today"] == 1
+
+    await client.delete(f"/images/{image_id}", headers=auth_header(token))
+
+    res = await client.get("/images/quota", headers=auth_header(token))
+    assert res.json()["user_uploads_today"] == 0
+
+
+@pytest.mark.asyncio
 async def test_quota_resets_after_midnight(client):
     token = await register_and_login(client)
 

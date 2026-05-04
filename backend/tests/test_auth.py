@@ -75,3 +75,15 @@ async def test_me_no_token(client):
 async def test_me_invalid_token(client):
     res = await client.get("/auth/me", headers={"Authorization": "Bearer garbage"})
     assert res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_register_empty_username(client):
+    res = await client.post("/auth/register", json={"username": "", "password": "pass"})
+    assert res.status_code in (400, 422)
+
+
+@pytest.mark.asyncio
+async def test_register_empty_password(client):
+    res = await client.post("/auth/register", json={"username": "user1", "password": ""})
+    assert res.status_code in (400, 422)

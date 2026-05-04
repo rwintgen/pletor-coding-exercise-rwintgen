@@ -1,3 +1,4 @@
+/** Color palette — primary, neutral, and semantic colors */
 export const colors = {
   primary: {
     50: '#eff6ff',
@@ -41,6 +42,7 @@ export const colors = {
   },
 } as const
 
+/** Spacing scale (8-point grid) */
 export const spacing = {
   xs: '4px',
   sm: '8px',
@@ -52,6 +54,7 @@ export const spacing = {
   '4xl': '64px',
 } as const
 
+/** Typography tokens — font family, sizes, weights, line heights */
 export const typography = {
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontSize: {
@@ -76,6 +79,7 @@ export const typography = {
   },
 } as const
 
+/** Border radius scale */
 export const radii = {
   sm: '4px',
   md: '8px',
@@ -84,6 +88,7 @@ export const radii = {
   full: '9999px',
 } as const
 
+/** Box shadow presets */
 export const shadows = {
   sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
   md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
@@ -91,6 +96,7 @@ export const shadows = {
   xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
 } as const
 
+/** Transition duration presets */
 export const transitions = {
   fast: '150ms ease',
   normal: '250ms ease',
