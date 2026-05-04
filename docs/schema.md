@@ -28,7 +28,9 @@
 
 ## Seed Data
 
-On first boot, the DB is populated with:
-- 5 users: alice, bob, charlie, diana, eve (all with password "password")
-- 55 images from Unsplash, distributed: alice(15), bob(12), charlie(10), diana(10), eve(8)
-- Timestamps spread across 3 days for realistic ordering
+On first boot (and on every restart — the schema is dropped and recreated in
+`main.py`'s lifespan), the DB is populated with:
+- 5 users: alice, bob, charlie, diana, eve (all with password `"password"`)
+- 55 images served from [Lorem Picsum](https://picsum.photos) (deterministic `seed/` URLs), distributed: alice(15), bob(12), charlie(10), diana(10), eve(8)
+- Mixed aspect ratios (landscape, portrait, square, panoramic) and varied resolutions to stress-test the masonry layout
+- Timestamps spread across ~2 years with varied months/days; some images share the exact same `created_at` to exercise stable sorting

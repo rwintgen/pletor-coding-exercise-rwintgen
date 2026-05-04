@@ -168,14 +168,14 @@ docker-compose.yml
 
 ### 3. Polished Gallery — ✅ Done
 
-- [x] Responsive grid layout (`auto-fill, minmax(260px, 1fr)`)
+- [x] Masonry layout (CSS multi-column, responsive 4→3→2→1) that respects each image's natural aspect ratio — no cropping
 - [x] Hover micro-interactions (zoom on image, underline on username, scale on FAB)
 - [x] Loading state (spinner)
 - [x] Empty state (different copy for authenticated vs anonymous)
 - [x] Error banner for network errors
 - [x] Upload via floating action button + modal overlay
 - [x] Lightbox (modal) for image detail with Escape/backdrop close
-- [x] Delete confirmation prompt
+- [x] Themed `ConfirmDialog` for destructive actions (replaces native `confirm()`)
 - [x] Optimistic UI: queries invalidated on upload/delete
 
 ### Bonus / Extra — ✅ Done

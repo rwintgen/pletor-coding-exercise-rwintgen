@@ -12,10 +12,10 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 - **routers/users.py**: GET /users/{username}, GET /users/{username}/images
 - **services/quota.py**: Daily quota counters + `enforce_quota()` (per-user + global)
 - **auth.py**: bcrypt hashing, JWT (HS256), `get_current_user` dependency — secret + expiry sourced from `config.py`
-- **models.py**: SQLAlchemy ORM models (User, Image) with cascade delete on user → images
+- **models.py**: SQLAlchemy ORM models (User, Image). No DB-level cascade is configured; user deletion explicitly deletes the user's images first in `routers/auth.py::delete_account`.
 - **schemas.py**: Pydantic request/response schemas + `image_to_dict` helper used by both image and user routers to keep response shape consistent
-- **seed.py**: Creates users + images on first boot
-- **db.py**: Async SQLite via aiosqlite
+- **seed.py**: Idempotent seed (skips if any image exists). Creates 5 users + 55 images with mixed aspect ratios and timestamps spread across ~2 years.
+- **db.py**: Async SQLite via aiosqlite. Note: `main.py`'s lifespan calls `drop_all` + `create_all` on every startup — this is a development convenience and should be replaced with migrations (Alembic) before production.
 
 ## API Endpoints
 
@@ -45,7 +45,7 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 
 ### Scalability notes
 
-- DB indexes on `images.title`, `images.created_at`, `images.user_id` for fast queries.
+- DB indexes on `images.title`, `images.created_at`, `images.user_id`, and `users.username` for fast lookups and search.
 - Pagination via `limit`/`offset` prevents unbounded result sets.
 
 ## Auth Flow
@@ -64,15 +64,16 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 - **stores/auth.ts**: Zustand store with `persist` middleware (token + user persisted to localStorage)
 - **lib/schemas.ts**: Zod validation schemas (login, register, upload)
 - **lib/queryClient.ts**: TanStack Query client singleton
+- **lib/errors.ts**: `errorMessage()` helper that normalizes thrown values (Error / string / unknown) into a display string
 - **hooks/useImages.ts**: `useImages`, `useUserImages`, `useUploadImage`, `useDeleteImage` query/mutation hooks
 - **hooks/useQuota.ts**: `useQuota` query hook (skipped when unauthenticated)
 - **components/ui/**: primitives (`Button`, `Input`, `Card`, `Spinner`)
-- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `GalleryToolbar`, `Modal`, `EmptyState`, `ErrorBanner`, `Fab`)
+- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `GalleryToolbar`, `Modal`, `ConfirmDialog`, `EmptyState`, `ErrorBanner`, `Fab`)
 - **features/auth/**: `LoginPage`, `RegisterPage`, shared `AuthShell`
 - **features/gallery/**: `GalleryPage` (masonry grid + FAB upload), `UploadForm` (single + batch), `ImageDetail` (lightbox)
 - **features/profile/**: `ProfilePage` (user's images with delete for own)
 - **theme.ts**: design tokens (colors, gradients, spacing, typography, radii, shadows, transitions). `colors.neutral/primary/accent` resolve to CSS variables defined in `index.css`, which lets the app **automatically follow the system dark/light preference** via `@media (prefers-color-scheme: dark)` — no toggle, no flash, no per-component refactor.
-- **index.css**: global CSS variables (light + dark palettes), keyframes (`slideUp`, `scaleIn`, `shimmer`, `pulse`), `.page-enter` / `.stagger-fade` animation utilities, `.masonry` multi-column layout (responsive 4→3→2→1 columns).
+- **index.css**: global CSS variables (light + dark palettes), keyframes (`fadeIn`, `scaleIn`, `slideUp`, `slideDown`, `shimmer`, `pulse`, `spin`), `.page-enter` / `.stagger-fade` animation utilities, `.masonry` multi-column layout (responsive 4→3→2→1 columns).
 - **App.tsx**: `BrowserRouter` with routes `/`, `/login`, `/register`, `/user/:username`; revalidates persisted token via `/auth/me` on mount
 
 ### Routing
