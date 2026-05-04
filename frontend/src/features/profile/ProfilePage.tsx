@@ -92,7 +92,7 @@ export function ProfilePage() {
           style={{
             width: 64,
             height: 64,
-            borderRadius: radii.lg,
+            borderRadius: radii['2xl'],
             background: gradients.brand,
             color: colors.neutral[0],
             display: 'flex',
