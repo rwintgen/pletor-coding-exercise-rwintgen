@@ -74,11 +74,10 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
               WebkitBackdropFilter: 'blur(6px)',
               color: colors.neutral[0],
               border: 'none',
-              borderRadius: radii.full,
+              borderRadius: radii.lg,
               width: 32,
               height: 32,
               cursor: 'pointer',
-              fontSize: 16,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -93,7 +92,7 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
               e.currentTarget.style.background = 'rgba(9,9,11,0.6)'
             }}
           >
-            ×
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         )}
       </div>

@@ -173,3 +173,37 @@ Ran a structured audit across components/theming, docs, architecture, tests, sec
 - `tsc --noEmit` clean. `eslint .` clean. `vite build` clean (4.4 KB CSS, 367 KB JS). `pytest` 47/47 pass.
 
 Result targets the 8.5/10 ceiling identified in the audit: env-driven config, file-size enforcement, typed error handling, strict TypeScript, expanded edge-case tests, and a clean repo.
+
+### UX polish: ConfirmDialog, navbar trim, cache invalidation
+- **ConfirmDialog component** (`components/ConfirmDialog.tsx`): reusable themed confirmation popup with glass backdrop, `fadeIn`/`scaleIn` animations, Escape + backdrop-click dismiss, `danger`/`primary` variants, `loading` prop for async actions. Uses existing `Button` (danger + ghost) and `Modal`-style backdrop.
+- Replaced all native `window.confirm()` calls with `ConfirmDialog`:
+  - `GalleryPage`: image delete via `deleteTarget` state
+  - `ProfilePage`: image delete (same pattern) + **account delete** (previously had zero confirmation)
+- **Navbar username trim**: usernames > 15 characters are trimmed with ellipsis (`…`) in the nav bar.
+- **Cache invalidation on account delete**: added `useQueryClient` in `ProfilePage`; after `deleteAccount()`, calls `queryClient.removeQueries` on `['images']` and `['user', username]` so the gallery refreshes immediately instead of showing stale cards.
+- Commit: `d52e0b9` — feat: ConfirmDialog component, navbar username trim, cache invalidation on account delete
+
+### Docs accuracy audit + seed data overhaul
+- **Docs fixes**:
+  - `schema.md`: "from Unsplash" → "from Lorem Picsum (picsum.photos)"; updated seed description (2-year spread, mixed aspect ratios, duplicates).
+  - `architecture.md`: corrected "cascade delete on user → images" — cascade is manual in `routers/auth.py::delete_account`, not via SQLAlchemy `relationship(cascade=…)`. Added `ConfirmDialog` to component list, `lib/errors.ts` to frontend list, full keyframes list (`fadeIn`, `scaleIn`, `slideUp`, `slideDown`, `shimmer`, `pulse`, `spin`), note about `drop_all`+`create_all` on startup (dev-only), `users.username` index.
+  - `README.md`: replaced stale "auto-fill grid" line with masonry; added `ConfirmDialog` to polished gallery checklist.
+- **Seed data rewrite** (`seed.py`):
+  - 12 varied aspect ratios cycled deterministically: 3:2, 2:3, 1:1, 16:9, 9:16, 2:1 panoramic, 3:4, 3:2 hi-res, 2:3 mid-res, 4:3, 3:4, 4:5 social.
+  - 55 timestamps spread across ~2 years (today → 731 days ago) with uneven spacing and several deliberate `created_at` duplicates to exercise stable sort.
+- Commit: `fdc75b0` — docs: fix inaccuracies, add missing items; seed: varied aspect ratios + 2-year date spread
+
+### Global quota bar, image rename, UI fixes
+- **Global quota progress bar**: `QuotaIndicator` now shows two bars — "Your uploads" (user quota, 8px) and "Team uploads" (global quota, 6px) — both with the same color-coded thresholds.
+- **Image rename (PATCH /images/{id})**:
+  - Backend: new `ImageUpdate` Pydantic schema (`title` min 1, max 200), new `PATCH /{image_id}` endpoint in `routers/images.py` (owner-only, 403/404). Docs updated with PATCH in API table.
+  - Frontend: `renameImage()` in `api/client.ts`, `useRenameImage` mutation hook in `hooks/useImages.ts`, inline title editing in `ImageDetail` lightbox (click title → input + checkmark save + X cancel buttons, Escape to cancel).
+  - 4 new backend tests: rename own, rename forbidden (other user), rename requires auth, rename empty title rejected. Total: **51 tests**, all passing.
+- **Avatar shape**: navbar avatar changed from circle (`borderRadius: 50%`) to square with rounded corners (`borderRadius: radii.lg`).
+- **Delete button icon**: replaced Unicode `×` with SVG X icon in `ImageCard`; button shape changed from circle to rounded-corner square (`borderRadius: radii.lg`).
+- **FAB (upload button)**: replaced text `+` with SVG plus icon; removed `translateY(-3px)` from hover (was causing upward drift) → now uses `scale(1.08)` centered via `display: flex; align-items: center; justify-content: center`. Corner radius aligned with other icons (`radii.lg`).
+
+### Optimistic rename + navbar polish
+- **Optimistic title update**: `ImageDetail` now tracks a `localTitle` state that updates instantly on save; syncs back from the `image` prop via `useEffect` when query refetches.
+- **Navbar floating pill**: changed from full-bleed `borderBottom` bar to a floating pill with rounded corners (`radii.xl`), `top: spacing.sm` offset and `margin: 0 spacing.sm` so page content peeks above and on the sides.
+- **Profile link hover**: the avatar + username `<Link>` now has padding + `borderRadius: radii.lg` and a subtle `colors.neutral[100]` background on hover, matching the ghost button feel of "Sign out".

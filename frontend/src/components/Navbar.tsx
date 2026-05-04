@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth'
-import { colors, gradients, spacing, transitions, typography } from '../theme'
+import { colors, gradients, radii, spacing, transitions, typography } from '../theme'
 import { Button } from './ui/Button'
 
 /** Top navigation bar. Glass effect, gradient brand, current user, login/logout actions. */
@@ -17,12 +17,14 @@ export function Navbar() {
     <nav
       style={{
         position: 'sticky',
-        top: 0,
+        top: spacing.sm,
         zIndex: 50,
         background: 'var(--surface-glass)',
         backdropFilter: 'saturate(180%) blur(14px)',
         WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-        borderBottom: `1px solid ${colors.neutral[150]}`,
+        border: `1px solid ${colors.neutral[150]}`,
+        borderRadius: radii.xl,
+        margin: `0 ${spacing.sm}`,
         padding: `${spacing.md} ${spacing.xl}`,
         display: 'flex',
         alignItems: 'center',
@@ -51,14 +53,24 @@ export function Navbar() {
           <>
             <Link
               to={`/user/${user.username}`}
-              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: spacing.sm }}
+              style={{
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: spacing.sm,
+                padding: `${spacing.xs} ${spacing.sm}`,
+                borderRadius: radii.lg,
+                transition: `background ${transitions.fast}`,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = colors.neutral[100] }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
-              {/* Avatar circle — always visible */}
+              {/* Avatar — always visible */}
               <span
                 style={{
                   width: 32,
                   height: 32,
-                  borderRadius: '50%',
+                  borderRadius: radii.lg,
                   background: gradients.brand,
                   display: 'flex',
                   alignItems: 'center',

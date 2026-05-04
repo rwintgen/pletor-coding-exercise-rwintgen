@@ -29,6 +29,7 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 | GET | /images/quota | Yes | Returns quota status (user + global) |
 | GET | /images/{id} | No | Get single image |
 | POST | /images/upload | Yes | Upload image (400 wrong type, 413 too large, 429 quota exceeded) |
+| PATCH | /images/{id} | Yes | Rename image (owner only — 403 otherwise, 404 if missing) |
 | DELETE | /images/{id} | Yes | Delete image (owner only — 403 otherwise, 404 if missing, idempotent) |
 | GET | /users/{username} | No | Get user profile |
 | GET | /users/{username}/images | No | Get all images by a user |

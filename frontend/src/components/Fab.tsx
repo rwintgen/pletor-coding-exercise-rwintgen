@@ -28,29 +28,28 @@ export function Fab({ onClick, label = 'Upload image' }: FabProps) {
         right: 32,
         width: 60,
         height: 60,
-        borderRadius: radii.xl,
+        borderRadius: radii.lg,
         background: gradients.brand,
         color: colors.neutral[0],
         border: 'none',
-        fontSize: '32px',
-        fontWeight: 300,
-        lineHeight: '60px',
-        textAlign: 'center' as const,
         cursor: 'pointer',
         boxShadow: hover
           ? '0 22px 50px -10px rgba(99,102,241,0.55), 0 0 0 6px rgba(99,102,241,0.12)'
           : shadows.brand,
         padding: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         transform: active
-          ? 'translateY(0) scale(0.96)'
+          ? 'scale(0.96)'
           : hover
-            ? 'translateY(-3px) scale(1.04)'
-            : 'translateY(0) scale(1)',
+            ? 'scale(1.08)'
+            : 'scale(1)',
         transition: `transform ${transitions.normal}, box-shadow ${transitions.normal}`,
         zIndex: 40,
       }}
     >
-      +
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
     </button>
   )
 }

@@ -115,6 +115,20 @@ export async function deleteImage(id: number): Promise<void> {
   }
 }
 
+/** Renames an image (requires auth, owner only) */
+export async function renameImage(id: number, title: string): Promise<Image> {
+  const res = await fetch(`${API_URL}/images/${id}`, {
+    method: 'PATCH',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.detail || 'Failed to rename image')
+  }
+  return res.json()
+}
+
 /** Fetches current quota status (requires auth) */
 export async function getQuota(): Promise<QuotaStatus> {
   const res = await fetch(`${API_URL}/images/quota`, {

@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { deleteImage, getUserImages, ListImagesParams, listImages, PAGE_SIZE, uploadImage } from '../api/client'
+import { deleteImage, getUserImages, ListImagesParams, listImages, PAGE_SIZE, renameImage, uploadImage } from '../api/client'
 
 /** Fetches images with infinite scroll (load more) pagination. */
 export function useImages(params?: ListImagesParams) {
@@ -43,6 +43,18 @@ export function useDeleteImage() {
       qc.invalidateQueries({ queryKey: ['images'] })
       qc.invalidateQueries({ queryKey: ['userImages'] })
       qc.invalidateQueries({ queryKey: ['quota'] })
+    },
+  })
+}
+
+/** Mutation hook for renaming; invalidates images on success. */
+export function useRenameImage() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, title }: { id: number; title: string }) => renameImage(id, title),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['images'] })
+      qc.invalidateQueries({ queryKey: ['userImages'] })
     },
   })
 }

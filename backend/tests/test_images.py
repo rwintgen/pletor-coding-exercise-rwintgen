@@ -225,3 +225,79 @@ async def test_search_param_does_not_leak_sql(client):
     res = await client.get("/images/", params={"search": "' OR '1'='1"})
     assert res.status_code == 200
     assert res.json() == []
+
+
+@pytest.mark.asyncio
+async def test_rename_own_image(client):
+    """Owner can rename their image via PATCH."""
+    token = await register_and_login(client)
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "original"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    image_id = upload.json()["id"]
+    res = await client.patch(
+        f"/images/{image_id}",
+        json={"title": "renamed"},
+        headers=auth_header(token),
+    )
+    assert res.status_code == 200
+    assert res.json()["title"] == "renamed"
+
+    # Verify persisted
+    res = await client.get(f"/images/{image_id}")
+    assert res.json()["title"] == "renamed"
+
+
+@pytest.mark.asyncio
+async def test_rename_other_users_image_forbidden(client):
+    """Non-owner cannot rename someone else's image."""
+    token1 = await register_and_login(client, "owner2", "pw")
+    token2 = await register_and_login(client, "stranger", "pw")
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "mine"},
+        files=[fake_image()],
+        headers=auth_header(token1),
+    )
+    image_id = upload.json()["id"]
+    res = await client.patch(
+        f"/images/{image_id}",
+        json={"title": "hacked"},
+        headers=auth_header(token2),
+    )
+    assert res.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_rename_requires_auth(client):
+    token = await register_and_login(client)
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "pic"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    image_id = upload.json()["id"]
+    res = await client.patch(f"/images/{image_id}", json={"title": "new"})
+    assert res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_rename_empty_title_rejected(client):
+    token = await register_and_login(client)
+    upload = await client.post(
+        "/images/upload",
+        data={"title": "pic"},
+        files=[fake_image()],
+        headers=auth_header(token),
+    )
+    image_id = upload.json()["id"]
+    res = await client.patch(
+        f"/images/{image_id}",
+        json={"title": ""},
+        headers=auth_header(token),
+    )
+    assert res.status_code == 422

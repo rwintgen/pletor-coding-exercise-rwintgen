@@ -10,7 +10,7 @@ from app.auth import get_current_user
 from app.config import ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES
 from app.db import get_db
 from app.models import Image, User
-from app.schemas import ImageRead, QuotaStatus, image_to_dict
+from app.schemas import ImageRead, ImageUpdate, QuotaStatus, image_to_dict
 from app.services.quota import QuotaExceededError, check_quota, enforce_quota
 
 router = APIRouter(prefix="/images", tags=["images"])
@@ -123,6 +123,28 @@ async def get_image(image_id: int, db: AsyncSession = Depends(get_db)):
     if row is None:
         raise HTTPException(status_code=404, detail="Image not found")
     return image_to_dict(row.Image, row.username)
+
+
+@router.patch("/{image_id}", response_model=ImageRead)
+async def update_image(
+    image_id: int,
+    body: ImageUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update an image's title. Only the owner is authorized."""
+    result = await db.execute(select(Image).where(Image.id == image_id))
+    image = result.scalar_one_or_none()
+    if image is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    if image.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403, detail="You can only edit your own images"
+        )
+    image.title = body.title
+    await db.commit()
+    await db.refresh(image)
+    return image_to_dict(image, current_user.username)
 
 
 @router.delete("/{image_id}", status_code=204)

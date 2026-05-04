@@ -46,6 +46,10 @@ class QuotaStatus(BaseModel):
     can_upload: bool
 
 
+class ImageUpdate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+
+
 def image_to_dict(image: Image, username: str) -> dict:
     """Serialize an ``Image`` row plus the joined ``username`` into the shape
     expected by the ``ImageRead`` response schema. Used by image and user
