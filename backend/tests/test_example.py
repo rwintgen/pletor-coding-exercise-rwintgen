@@ -2,6 +2,7 @@
 Example test showing the fixture wiring. Models the pattern; tests nothing real.
 Replace this with a test for the piece you'd most want to defend in code review.
 """
+
 import pytest
 
 

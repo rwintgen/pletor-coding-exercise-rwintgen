@@ -25,7 +25,10 @@ async def upload_image(
     db: AsyncSession = Depends(get_db),
 ):
     if file.content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail="File type not allowed. Use JPEG, PNG, GIF, or WebP.")
+        raise HTTPException(
+            status_code=400,
+            detail="File type not allowed. Use JPEG, PNG, GIF, or WebP.",
+        )
 
     ext = Path(file.filename).suffix if file.filename else ".jpg"
     filename = f"{uuid.uuid4()}{ext}"

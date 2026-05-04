@@ -12,6 +12,7 @@ from app.seed import seed_if_empty
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     async with SessionLocal() as db:
         await seed_if_empty(db)
