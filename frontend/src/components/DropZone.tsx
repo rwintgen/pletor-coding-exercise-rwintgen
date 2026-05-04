@@ -2,24 +2,29 @@ import { useRef, useState } from 'react'
 import { colors, radii, spacing, transitions, typography } from '../theme'
 
 interface DropZoneProps {
-  onFile: (file: File) => void
-  selectedFile: File | null
+  /** Called with the full list of accepted files (single or batch). */
+  onFiles: (files: File[]) => void
+  selectedFiles: File[]
   disabled?: boolean
+  /** When true, allows selecting multiple files at once. */
+  multiple?: boolean
 }
 
-/** Drag-and-drop file picker for image uploads. */
-export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
+/** Drag-and-drop file picker — supports single or batch uploads. */
+export function DropZone({ onFiles, selectedFiles, disabled, multiple }: DropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [hover, setHover] = useState(false)
 
-  const accept = (file: File | undefined) => {
-    if (!file) return
-    if (!file.type.startsWith('image/')) return
-    onFile(file)
+  const accept = (files: FileList | File[] | null | undefined) => {
+    if (!files) return
+    const arr = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (arr.length === 0) return
+    onFiles(multiple ? arr : [arr[0]])
   }
 
   const active = isDragging || hover
+  const count = selectedFiles.length
 
   return (
     <div
@@ -37,7 +42,7 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
       onDrop={(e) => {
         e.preventDefault()
         setIsDragging(false)
-        if (!disabled) accept(e.dataTransfer.files[0])
+        if (!disabled) accept(e.dataTransfer.files)
       }}
       style={{
         border: `2px dashed ${isDragging ? colors.primary[500] : active ? colors.primary[400] : colors.neutral[200]}`,
@@ -56,11 +61,12 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
         ref={inputRef}
         type="file"
         accept="image/*"
+        multiple={multiple}
         disabled={disabled}
-        onChange={(e) => accept(e.target.files?.[0] ?? undefined)}
+        onChange={(e) => accept(e.target.files)}
         style={{ display: 'none' }}
       />
-      {selectedFile ? (
+      {count > 0 ? (
         <div>
           <p
             style={{
@@ -70,7 +76,9 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
               fontSize: typography.fontSize.sm,
             }}
           >
-            {selectedFile.name}
+            {count === 1
+              ? selectedFiles[0].name
+              : `${count} images selected`}
           </p>
           <p
             style={{
@@ -79,7 +87,9 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
               color: colors.neutral[500],
             }}
           >
-            {(selectedFile.size / 1024).toFixed(1)} KB · click or drop to replace
+            {count === 1
+              ? `${(selectedFiles[0].size / 1024).toFixed(1)} KB · click or drop to replace`
+              : `${(selectedFiles.reduce((s, f) => s + f.size, 0) / 1024).toFixed(1)} KB total · click or drop to replace`}
           </p>
         </div>
       ) : (
@@ -102,7 +112,7 @@ export function DropZone({ onFile, selectedFile, disabled }: DropZoneProps) {
               fontSize: typography.fontSize.sm,
             }}
           >
-            Drop an image here
+            {multiple ? 'Drop one or more images here' : 'Drop an image here'}
           </p>
           <p
             style={{

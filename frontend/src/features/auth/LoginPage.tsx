@@ -99,7 +99,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
         justifyContent: 'center',
         padding: spacing.xl,
         background:
-          'radial-gradient(circle at 20% 0%, rgba(99,102,241,0.12), transparent 45%), radial-gradient(circle at 80% 100%, rgba(236,72,153,0.10), transparent 45%), #fafafa',
+          'radial-gradient(circle at 20% 0%, var(--bg-radial-1), transparent 45%), radial-gradient(circle at 80% 100%, var(--bg-radial-2), transparent 45%), var(--bg-page)',
       }}
     >
       <div

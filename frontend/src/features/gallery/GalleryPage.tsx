@@ -93,12 +93,7 @@ export function GalleryPage() {
       ) : images && images.length > 0 ? (
         <>
           <div
-            className="stagger-fade"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-              gap: spacing.xl,
-            }}
+            className="masonry stagger-fade"
           >
             {images.map((img) => (
               <ImageCard

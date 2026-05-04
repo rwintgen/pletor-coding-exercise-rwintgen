@@ -19,7 +19,7 @@ export function Navbar() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(255,255,255,0.72)',
+        background: 'var(--surface-glass)',
         backdropFilter: 'saturate(180%) blur(14px)',
         WebkitBackdropFilter: 'saturate(180%) blur(14px)',
         borderBottom: `1px solid ${colors.neutral[150]}`,

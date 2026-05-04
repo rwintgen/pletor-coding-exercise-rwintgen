@@ -190,12 +190,8 @@ docker-compose.yml
 
 ### Not implemented (would do with more time)
 
-- [ ] Batch upload (multiple files at once)
-- [ ] Masonry / justified-row layout (respecting real aspect ratios)
-- [ ] Infinite scroll / "load more" in the frontend
-- [ ] Cursor-based pagination for true scalability
-- [ ] Full-text search (Postgres tsvector or Meilisearch)
-- [ ] Upload progress indicator (XHR with progress events)
-- [ ] Animated transitions between states (fade in cards, slide modal)
-- [ ] Accessibility audit (ARIA labels, focus management, keyboard nav)
-- [ ] CDN for images / thumbnail generation
+- [x] Batch upload (multiple files at once) — drop or select many; shared optional title falls back to filename; sequential upload with `Uploading 3/5…` progress; pre-flight check against remaining daily quota
+- [x] Masonry layout (respects each image's natural aspect ratio) — CSS multi-column, responsive 4→3→2→1 columns, no cropping
+- [x] "Load more" infinite scroll in the frontend — `useInfiniteQuery` paginates via API `limit`/`offset`
+- [x] Animated transitions between states — page-enter slide-up, staggered card fade-in, modal scale-in, shimmer placeholders, smooth hover lifts (cubic-bezier easing)
+- [x] Dark mode that follows the system — full palette via CSS variables, swaps on `prefers-color-scheme: dark`, no flash, no toggle

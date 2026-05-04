@@ -133,14 +133,7 @@ export function ProfilePage() {
           <Spinner size={36} />
         </div>
       ) : images && images.length > 0 ? (
-        <div
-          className="stagger-fade"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: spacing.xl,
-          }}
-        >
+        <div className="masonry stagger-fade">
           {images.map((img) => (
             <ImageCard
               key={img.id}

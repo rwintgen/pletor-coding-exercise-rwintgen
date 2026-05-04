@@ -63,11 +63,12 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 - **hooks/useImages.ts**: `useImages`, `useUserImages`, `useUploadImage`, `useDeleteImage` query/mutation hooks
 - **hooks/useQuota.ts**: `useQuota` query hook (skipped when unauthenticated)
 - **components/ui/**: primitives (`Button`, `Input`, `Card`, `Spinner`)
-- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `GalleryToolbar`, `Modal`, `EmptyState`, `ErrorBanner`)
+- **components/**: composed (`Navbar`, `ImageCard`, `DropZone`, `QuotaIndicator`, `GalleryToolbar`, `Modal`, `EmptyState`, `ErrorBanner`, `Fab`)
 - **features/auth/**: `LoginPage`, `RegisterPage`, shared `AuthShell`
-- **features/gallery/**: `GalleryPage`, `UploadForm`, `ImageDetail` (lightbox)
+- **features/gallery/**: `GalleryPage` (masonry grid + FAB upload), `UploadForm` (single + batch), `ImageDetail` (lightbox)
 - **features/profile/**: `ProfilePage` (user's images with delete for own)
-- **theme.ts**: design tokens (colors, spacing, typography, radii, shadows, transitions)
+- **theme.ts**: design tokens (colors, gradients, spacing, typography, radii, shadows, transitions). `colors.neutral/primary/accent` resolve to CSS variables defined in `index.css`, which lets the app **automatically follow the system dark/light preference** via `@media (prefers-color-scheme: dark)` — no toggle, no flash, no per-component refactor.
+- **index.css**: global CSS variables (light + dark palettes), keyframes (`slideUp`, `scaleIn`, `shimmer`, `pulse`), `.page-enter` / `.stagger-fade` animation utilities, `.masonry` multi-column layout (responsive 4→3→2→1 columns).
 - **App.tsx**: `BrowserRouter` with routes `/`, `/login`, `/register`, `/user/:username`; revalidates persisted token via `/auth/me` on mount
 
 ### Routing

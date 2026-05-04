@@ -27,7 +27,7 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '4 / 3',
+          minHeight: loaded ? undefined : 180,
           background: `linear-gradient(110deg, ${colors.neutral[150]} 30%, ${colors.neutral[100]} 50%, ${colors.neutral[150]} 70%)`,
           backgroundSize: '200% 100%',
           animation: loaded ? 'none' : 'shimmer 1.6s linear infinite',
@@ -41,11 +41,10 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
           onLoad={() => setLoaded(true)}
           style={{
             width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            height: 'auto',
             display: 'block',
             opacity: loaded ? 1 : 0,
-            transform: hover ? 'scale(1.06)' : 'scale(1)',
+            transform: hover ? 'scale(1.04)' : 'scale(1)',
             transition: `transform ${transitions.slow}, opacity ${transitions.normal}`,
           }}
         />

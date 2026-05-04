@@ -1,15 +1,98 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ------------------------------------------------------------------
+ * Design tokens — light mode (default)
+ * Dark mode below uses `prefers-color-scheme: dark` and follows the
+ * user's OS setting automatically (no toggle, no flash).
+ * ------------------------------------------------------------------ */
 :root {
+  /* Primary (indigo) */
+  --primary-50: #eef2ff;
+  --primary-100: #e0e7ff;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+
+  /* Accent (rose) */
+  --accent-400: #f472b6;
+  --accent-500: #ec4899;
+  --accent-600: #db2777;
+
+  /* Neutral (zinc) — light */
+  --neutral-0: #ffffff;
+  --neutral-50: #fafafa;
+  --neutral-100: #f4f4f5;
+  --neutral-150: #ececef;
+  --neutral-200: #e4e4e7;
+  --neutral-300: #d4d4d8;
+  --neutral-400: #a1a1aa;
+  --neutral-500: #71717a;
+  --neutral-600: #52525b;
+  --neutral-700: #3f3f46;
+  --neutral-800: #27272a;
+  --neutral-900: #18181b;
+  --neutral-950: #09090b;
+
+  /* Page-level surfaces */
+  --bg-page: #fafafa;
+  --bg-radial-1: rgba(99, 102, 241, 0.08);
+  --bg-radial-2: rgba(236, 72, 153, 0.06);
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  --scrollbar-thumb: rgba(24, 24, 27, 0.15);
+  --scrollbar-thumb-hover: rgba(24, 24, 27, 0.3);
+  --selection-bg: rgba(99, 102, 241, 0.25);
+
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
-  color: #18181b;
-  background-color: #fafafa;
+  color: var(--neutral-900);
+  background-color: var(--bg-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Primary stays vivid in dark — slight tone shifts for legibility */
+    --primary-50: #1e1b4b;
+    --primary-100: #312e81;
+    --primary-400: #a5b4fc;
+    --primary-500: #818cf8;
+    --primary-600: #6366f1;
+    --primary-700: #4f46e5;
+
+    /* Accent — slightly brighter in dark */
+    --accent-400: #f9a8d4;
+    --accent-500: #f472b6;
+    --accent-600: #ec4899;
+
+    /* Neutrals inverted (zinc) */
+    --neutral-0: #18181b;
+    --neutral-50: #1f1f23;
+    --neutral-100: #27272a;
+    --neutral-150: #2c2c30;
+    --neutral-200: #3f3f46;
+    --neutral-300: #52525b;
+    --neutral-400: #71717a;
+    --neutral-500: #a1a1aa;
+    --neutral-600: #d4d4d8;
+    --neutral-700: #e4e4e7;
+    --neutral-800: #f4f4f5;
+    --neutral-900: #fafafa;
+    --neutral-950: #ffffff;
+
+    --bg-page: #0b0b0f;
+    --bg-radial-1: rgba(99, 102, 241, 0.18);
+    --bg-radial-2: rgba(236, 72, 153, 0.12);
+    --surface-glass: rgba(20, 20, 24, 0.72);
+    --scrollbar-thumb: rgba(244, 244, 245, 0.18);
+    --scrollbar-thumb-hover: rgba(244, 244, 245, 0.32);
+    --selection-bg: rgba(129, 140, 248, 0.35);
+  }
 }
 
 * {
@@ -24,10 +107,12 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at 15% -10%, rgba(99, 102, 241, 0.08), transparent 45%),
-    radial-gradient(circle at 95% 110%, rgba(236, 72, 153, 0.06), transparent 45%),
-    #fafafa;
+    radial-gradient(circle at 15% -10%, var(--bg-radial-1), transparent 45%),
+    radial-gradient(circle at 95% 110%, var(--bg-radial-2), transparent 45%),
+    var(--bg-page);
   background-attachment: fixed;
+  color: var(--neutral-900);
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 a {
@@ -54,7 +139,7 @@ button:focus-visible {
 }
 
 ::selection {
-  background: rgba(99, 102, 241, 0.25);
+  background: var(--selection-bg);
 }
 
 /* Subtle custom scrollbar */
@@ -66,13 +151,13 @@ button:focus-visible {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(24, 24, 27, 0.15);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(24, 24, 27, 0.3);
+  background: var(--scrollbar-thumb-hover);
   background-clip: padding-box;
   border: 3px solid transparent;
 }
@@ -147,4 +232,32 @@ button:focus-visible {
 .stagger-fade > *:nth-child(7) { animation-delay: 180ms; }
 .stagger-fade > *:nth-child(8) { animation-delay: 210ms; }
 .stagger-fade > *:nth-child(n+9) { animation-delay: 240ms; }
+
+/* ------------------------------------------------------------------
+ * Masonry layout via CSS multi-column. Respects each image's natural
+ * aspect ratio while keeping all columns visually balanced.
+ * Number of columns adapts to viewport width.
+ * ------------------------------------------------------------------ */
+.masonry {
+  column-gap: 24px;
+  column-count: 4;
+}
+.masonry > * {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 24px;
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 1280px) {
+  .masonry { column-count: 3; }
+}
+@media (max-width: 880px) {
+  .masonry { column-count: 2; }
+}
+@media (max-width: 560px) {
+  .masonry { column-count: 1; }
+}
 

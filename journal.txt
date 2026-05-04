@@ -118,3 +118,19 @@
 - **Scalability**: added DB indexes on `title`, `created_at`, `user_id`; added `limit`/`offset` pagination to `GET /images/` (default 50, max 200). Documented next steps for millions of images (full-text search, cursor pagination, CDN, read replicas).
 - 1 new test: `test_pagination_limit_offset`
 - Total: 43 tests, all passing
+### Modern frontend redesign (high-end visual polish)
+- **Design system overhaul** in `theme.ts`: indigo→violet→rose brand gradient, expanded neutral scale (0–950 incl. 150 step), 7-tier shadow ladder (xs→xl + glow + glowAccent + brand), cubic-bezier easing tokens, generous radii, Inter via Google Fonts.
+- **Animations everywhere**: page-enter slide-up, staggered card fade-in (`.stagger-fade` with nth-child delays), modal scale-in, shimmer placeholders, hover lifts (`translateY(-4px)` cards, `translateY(-1px)` buttons, scale on FAB), gradient overlay reveal on image hover.
+- **Glass effects**: navbar uses `backdrop-filter: blur` over translucent surface; modal backdrop blurs page content.
+- **UI primitives rebuilt**: Button (gradient brand variant + scale-on-press), Input (animated focus glow ring), Card (lift + shadow on hover), Spinner, Modal, DropZone, EmptyState (icon circle), ErrorBanner (slide-down).
+- **New `Fab` component** shared by Gallery + Profile pages.
+- **ImageCard**: shimmer skeleton until loaded, hover zoom + gradient overlay, animated delete button (opacity + scale).
+- **GalleryToolbar**: SVG search icon inside input, focus glow ring, custom select chevron.
+- **Auth pages**: redesigned AuthShell with stronger card shadow, gradient title, brand-tinted radial backdrop.
+- Commit: `2e96c95` — feat(ui): modern redesign — gradient brand, smooth animations, glass effects, refined tokens
+
+### Final bonus pass — masonry, batch upload, dark mode
+- **Masonry layout**: replaced fixed CSS grid with CSS multi-column (`column-count` 4→3→2→1 responsive). Cards now flow naturally and `break-inside: avoid` keeps them intact. Removed forced 4:3 aspect-ratio in `ImageCard` so each image displays at its real proportion. Shimmer placeholder still works via `min-height` until load.
+- **Batch upload**: `DropZone` now accepts `multiple` files (drop or browse). `UploadForm` uploads sequentially, shows `Uploading 3/5…` progress, falls back to filename-as-title when shared title is empty, and pre-flight-checks the selection against remaining daily quota (refuses to start if it would exceed).
+- **Dark mode (auto, follows system)**: introduced full CSS variable palette in `index.css` (`--neutral-0..950`, `--primary-50..700`, `--accent-400..600`, `--bg-page`, `--surface-glass`, `--scrollbar-thumb`, etc.). `theme.ts` `colors.neutral/primary/accent` now resolve to `var(--…)` so existing inline styles automatically swap. `@media (prefers-color-scheme: dark)` overrides every var with an inverted palette. Navbar glass and Auth shell radial backdrop use vars too. No flash, no toggle, no app-wide refactor.
+- Lint + build clean (4.37 KB CSS, 366 KB JS).
