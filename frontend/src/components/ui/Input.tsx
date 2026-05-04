@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef, useState } from 'react'
+import { InputHTMLAttributes, forwardRef, useId, useState } from 'react'
 import { colors, radii, shadows, spacing, transitions, typography } from '../../theme'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -8,7 +8,10 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 /** Themed text input with optional label, animated focus ring, and inline error message. */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, style, onFocus, onBlur, ...rest }, ref) => {
+  ({ label, error, style, id, name, onFocus, onBlur, ...rest }, ref) => {
+    const generatedId = useId()
+    const inputId = id ?? generatedId
+    const inputName = name ?? (label ? label.toLowerCase().replace(/\s+/g, '_') : undefined)
     const [focused, setFocused] = useState(false)
     const borderColor = error
       ? colors.error[500]
@@ -18,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const ring = focused && !error ? shadows.glow : error ? '0 0 0 4px rgba(239,68,68,0.15)' : 'none'
     return (
       <label
+        htmlFor={inputId}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -31,6 +35,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label}
         <input
           ref={ref}
+          id={inputId}
+          name={inputName}
           {...rest}
           onFocus={(e) => {
             setFocused(true)

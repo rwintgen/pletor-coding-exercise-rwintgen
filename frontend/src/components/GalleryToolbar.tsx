@@ -79,6 +79,7 @@ export function GalleryToolbar({
         </svg>
         <input
           type="text"
+          name="search"
           placeholder="Search by title or user…"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
@@ -102,6 +103,7 @@ export function GalleryToolbar({
       </div>
 
       <select
+        name="sort"
         value={sort}
         onChange={(e) => onSortChange(e.target.value)}
         style={selectStyle}

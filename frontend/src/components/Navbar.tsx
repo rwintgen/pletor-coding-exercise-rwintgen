@@ -51,16 +51,37 @@ export function Navbar() {
           <>
             <Link
               to={`/user/${user.username}`}
-              style={{
-                color: colors.neutral[600],
-                fontSize: typography.fontSize.sm,
-                textDecoration: 'none',
-                transition: `color ${transitions.fast}`,
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = colors.primary[600] }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = colors.neutral[600] }}
+              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: spacing.sm }}
             >
-              Signed in as <strong style={{ color: colors.neutral[900] }}>{user.username}</strong>
+              {/* Avatar circle — always visible */}
+              <span
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: gradients.brand,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: typography.fontSize.sm,
+                  fontWeight: typography.fontWeight.bold,
+                  flexShrink: 0,
+                }}
+              >
+                {user.username[0].toUpperCase()}
+              </span>
+              {/* Username text — hidden on narrow viewports */}
+              <span
+                className="nav-user-text"
+                style={{
+                  color: colors.neutral[600],
+                  fontSize: typography.fontSize.sm,
+                  transition: `color ${transitions.fast}`,
+                }}
+              >
+                <strong style={{ color: colors.neutral[900] }}>{user.username}</strong>
+              </span>
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               Sign out

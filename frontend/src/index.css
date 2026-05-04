@@ -162,6 +162,11 @@ button:focus-visible {
   border: 3px solid transparent;
 }
 
+/* Navbar: hide username text on narrow viewports, avatar stays visible */
+@media (max-width: 520px) {
+  .nav-user-text { display: none; }
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
