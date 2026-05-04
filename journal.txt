@@ -45,3 +45,15 @@
 - `services/__init__.py` had TypeScript `export {}` — replaced with empty file
 - Rewrote format.sh to use `docker compose exec backend ruff` (requires running containers)
 - Ran formatter, all files clean, committed and pushed
+
+### Task: Phase 1 — Authentication & Ownership
+- Created `User` model with id, username, hashed_password, created_at
+- Added `user_id` FK to `Image` model (replaces plain `user` string field)
+- Created `auth.py`: bcrypt hashing, JWT creation/validation, `get_current_user` dependency
+- Created `routers/auth.py`: POST /auth/register, POST /auth/login, GET /auth/me
+- Protected upload (requires auth), delete (requires auth + ownership check: 403 if not owner)
+- Updated seed to create User records first, then link images via user_id
+- Fixed bcrypt/passlib compatibility (pinned bcrypt==4.0.1)
+- Updated schemas: added UserCreate, UserRead, Token; ImageRead now includes username via join
+- Chose JWT in Authorization header over session cookies for simplicity and SPA compatibility
+- All seeded users have password "password" for dev/testing

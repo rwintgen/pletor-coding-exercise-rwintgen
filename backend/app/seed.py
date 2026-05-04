@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Image
+from app.auth import hash_password
+from app.models import Image, User
 
 UNSPLASH_IDS = [
     "photo-1506744038136-46273834b3fb",
@@ -130,6 +131,13 @@ async def seed_if_empty(db: AsyncSession) -> None:
     if result.scalars().first():
         return
 
+    user_objects = []
+    for username in USERS:
+        user = User(username=username, hashed_password=hash_password("password"))
+        db.add(user)
+        user_objects.append(user)
+    await db.flush()
+
     now = datetime.utcnow()
     yesterday = now - timedelta(days=1)
     two_days_ago = now - timedelta(days=2)
@@ -148,7 +156,7 @@ async def seed_if_empty(db: AsyncSession) -> None:
             images.append(
                 Image(
                     title=TITLES[idx],
-                    user=USERS[user_idx],
+                    user_id=user_objects[user_idx].id,
                     url=f"https://images.unsplash.com/{UNSPLASH_IDS[idx]}",
                     created_at=ts,
                 )

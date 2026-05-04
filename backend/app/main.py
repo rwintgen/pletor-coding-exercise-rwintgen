@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.db import Base, SessionLocal, engine
-from app.routers import images
+from app.routers import auth, images
 from app.seed import seed_if_empty
 
 
@@ -30,6 +30,7 @@ app.add_middleware(
 )
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.include_router(auth.router)
 app.include_router(images.router)
 
 
