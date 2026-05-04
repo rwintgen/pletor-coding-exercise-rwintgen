@@ -43,7 +43,6 @@ PictoShare is a collaborative image gallery with authentication, per-user upload
 
 - DB indexes on `images.title`, `images.created_at`, `images.user_id` for fast queries.
 - Pagination via `limit`/`offset` prevents unbounded result sets.
-- For millions of images, next steps: full-text search engine (Postgres `tsvector` or Meilisearch), cursor-based pagination, CDN for images, read replicas.
 
 ## Auth Flow
 

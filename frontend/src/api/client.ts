@@ -152,3 +152,15 @@ export async function getMe(): Promise<UserInfo> {
   return res.json()
 }
 
+/** Deletes the current user's account and all their images (requires auth) */
+export async function deleteAccount(): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/account`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.detail || 'Failed to delete account')
+  }
+}
+

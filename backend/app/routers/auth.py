@@ -9,7 +9,7 @@ from app.auth import (
     verify_password,
 )
 from app.db import get_db
-from app.models import User
+from app.models import Image, User
 from app.schemas import Token, UserCreate, UserRead
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -47,3 +47,17 @@ async def login(body: UserCreate, db: AsyncSession = Depends(get_db)):
 @router.get("/me", response_model=UserRead)
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.delete("/account", status_code=204)
+async def delete_account(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete the current user's account and all their images."""
+    from sqlalchemy import delete as sa_delete
+
+    await db.execute(sa_delete(Image).where(Image.user_id == current_user.id))
+    await db.execute(sa_delete(User).where(User.id == current_user.id))
+    await db.commit()
+    return None

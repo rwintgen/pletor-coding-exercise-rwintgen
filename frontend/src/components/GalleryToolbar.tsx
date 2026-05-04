@@ -5,9 +5,6 @@ interface GalleryToolbarProps {
   onSearchChange: (value: string) => void
   sort: string
   onSortChange: (value: string) => void
-  filterUser: string
-  onFilterUserChange: (value: string) => void
-  users: string[]
 }
 
 const selectStyle = {
@@ -26,15 +23,12 @@ const selectStyle = {
   backgroundPosition: 'right 10px center',
 }
 
-/** Search bar + sort/filter dropdowns for the gallery. */
+/** Search bar + sort dropdown for the gallery. */
 export function GalleryToolbar({
   search,
   onSearchChange,
   sort,
   onSortChange,
-  filterUser,
-  onFilterUserChange,
-  users,
 }: GalleryToolbarProps) {
   return (
     <div
@@ -49,7 +43,7 @@ export function GalleryToolbar({
     >
       <input
         type="text"
-        placeholder="Search by title…"
+        placeholder="Search by title or user…"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         style={{
@@ -68,15 +62,6 @@ export function GalleryToolbar({
         <option value="newest">Sort: Newest</option>
         <option value="oldest">Sort: Oldest</option>
         <option value="title">Sort: Title A–Z</option>
-      </select>
-
-      <select value={filterUser} onChange={(e) => onFilterUserChange(e.target.value)} style={selectStyle}>
-        <option value="">Filter: All users</option>
-        {users.map((u) => (
-          <option key={u} value={u}>
-            Filter: {u}
-          </option>
-        ))}
       </select>
     </div>
   )

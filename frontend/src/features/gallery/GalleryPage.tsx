@@ -18,28 +18,19 @@ export function GalleryPage() {
   const token = useAuthStore((s) => s.token)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('newest')
-  const [filterUser, setFilterUser] = useState('')
   const [active, setActive] = useState<Image | null>(null)
   const [showUpload, setShowUpload] = useState(false)
 
   const params: ListImagesParams = useMemo(
     () => ({
       search: search || undefined,
-      user: filterUser || undefined,
       sort: sort as ListImagesParams['sort'],
     }),
-    [search, sort, filterUser],
+    [search, sort],
   )
 
   const { data: images, isLoading, error } = useImages(params)
-  const allImages = useImages()
   const deleteMutation = useDeleteImage()
-
-  const userList = useMemo(() => {
-    if (!allImages.data) return []
-    const names = new Set(allImages.data.map((img) => img.username))
-    return [...names].sort()
-  }, [allImages.data])
 
   const handleDelete = (image: Image) => {
     if (!confirm(`Delete "${image.title}"?`)) return
@@ -83,9 +74,6 @@ export function GalleryPage() {
         onSearchChange={setSearch}
         sort={sort}
         onSortChange={setSort}
-        filterUser={filterUser}
-        onFilterUserChange={setFilterUser}
-        users={userList}
       />
 
       {error && <ErrorBanner message={(error as Error).message} />}
@@ -139,17 +127,17 @@ export function GalleryPage() {
             right: 32,
             width: 56,
             height: 56,
-            borderRadius: radii.full,
+            borderRadius: radii.xl,
             background: colors.neutral[900],
             color: colors.neutral[0],
             border: 'none',
-            fontSize: '28px',
-            lineHeight: 1,
+            fontSize: '32px',
+            fontWeight: 300,
+            lineHeight: '56px',
+            textAlign: 'center' as const,
             cursor: 'pointer',
             boxShadow: shadows.xl,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            padding: 0,
             transition: 'transform 150ms ease',
             zIndex: 40,
           }}

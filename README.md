@@ -143,3 +143,59 @@ docker-compose.yml
 - **Backend:** Hot reload via `uvicorn --reload`. Edit `backend/app/` and changes reflect.
 - **Frontend:** Hot reload via Vite. Edit `frontend/src/` and changes reflect.
 - **Database:** SQLite at `backend/test.db`. Delete it to reset and re-seed.
+
+---
+
+## Progress
+
+### 1. Authentication & Ownership — ✅ Done
+
+- [x] User registration (`POST /auth/register`)
+- [x] User login with JWT (`POST /auth/login`)
+- [x] Protected upload — only authenticated users
+- [x] Protected delete — only the owner of an image
+- [x] Frontend login/register pages with form validation (Zod)
+- [x] Token stored in Zustand + localStorage, sent on every protected request
+- [x] Account deletion (own account only, cascades images)
+
+### 2. Upload Quotas — ✅ Done
+
+- [x] 10 images/user/day limit
+- [x] 100 images/day global limit
+- [x] Clear 429 error responses with explanation
+- [x] Quota indicator in the upload form (shows remaining)
+- [x] Race condition safety via `SELECT … FOR UPDATE` semantics (serialized SQLite writes)
+
+### 3. Polished Gallery — ✅ Done
+
+- [x] Responsive grid layout (`auto-fill, minmax(260px, 1fr)`)
+- [x] Hover micro-interactions (zoom on image, underline on username, scale on FAB)
+- [x] Loading state (spinner)
+- [x] Empty state (different copy for authenticated vs anonymous)
+- [x] Error banner for network errors
+- [x] Upload via floating action button + modal overlay
+- [x] Lightbox (modal) for image detail with Escape/backdrop close
+- [x] Delete confirmation prompt
+- [x] Optimistic UI: queries invalidated on upload/delete
+
+### Bonus / Extra — ✅ Done
+
+- [x] Image search (by title **and** by username)
+- [x] Sort (newest / oldest / title A–Z)
+- [x] User profile pages (`/user/:username`) with image list
+- [x] Profile links from image cards and lightbox
+- [x] DB indexes on `title`, `created_at`, `user_id` for performance
+- [x] Pagination support in API (`limit`/`offset` params)
+- [x] 43 automated tests (auth, upload, delete, quota, pagination)
+
+### Not implemented (would do with more time)
+
+- [ ] Batch upload (multiple files at once)
+- [ ] Masonry / justified-row layout (respecting real aspect ratios)
+- [ ] Infinite scroll / "load more" in the frontend
+- [ ] Cursor-based pagination for true scalability
+- [ ] Full-text search (Postgres tsvector or Meilisearch)
+- [ ] Upload progress indicator (XHR with progress events)
+- [ ] Animated transitions between states (fade in cards, slide modal)
+- [ ] Accessibility audit (ARIA labels, focus management, keyboard nav)
+- [ ] CDN for images / thumbnail generation

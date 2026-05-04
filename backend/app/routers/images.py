@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import get_current_user
@@ -83,7 +83,12 @@ async def list_images(
     stmt = select(Image, User.username).join(User, Image.user_id == User.id)
 
     if search:
-        stmt = stmt.where(Image.title.ilike(f"%{search}%"))
+        stmt = stmt.where(
+            or_(
+                Image.title.ilike(f"%{search}%"),
+                User.username.ilike(f"%{search}%"),
+            )
+        )
     if user:
         stmt = stmt.where(User.username == user)
 

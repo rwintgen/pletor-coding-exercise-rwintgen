@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import type { Image } from '../../api/client'
-import { getUserProfile } from '../../api/client'
+import { deleteAccount, getUserProfile } from '../../api/client'
 import { EmptyState } from '../../components/EmptyState'
 import { ErrorBanner } from '../../components/ErrorBanner'
 import { ImageCard } from '../../components/ImageCard'
@@ -16,8 +16,11 @@ import { ImageDetail } from '../gallery/ImageDetail'
 export function ProfilePage() {
   const { username } = useParams<{ username: string }>()
   const currentUser = useAuthStore((s) => s.user)
+  const clear = useAuthStore((s) => s.clear)
   const isOwnProfile = currentUser?.username === username
   const [active, setActive] = useState<Image | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const navigate = useNavigate()
 
   const {
     data: profile,
@@ -120,6 +123,62 @@ export function ProfilePage() {
       )}
 
       <ImageDetail image={active} onClose={() => setActive(null)} />
+
+      {isOwnProfile && (
+        <div
+          style={{
+            marginTop: spacing['3xl'],
+            paddingTop: spacing.xl,
+            borderTop: `1px solid ${colors.neutral[200]}`,
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: typography.fontSize.base,
+              fontWeight: typography.fontWeight.semibold,
+              color: colors.error[500],
+            }}
+          >
+            Danger zone
+          </h2>
+          <p
+            style={{
+              marginTop: spacing.xs,
+              color: colors.neutral[500],
+              fontSize: typography.fontSize.sm,
+            }}
+          >
+            Permanently delete your account and all your images.
+          </p>
+          <button
+            disabled={deleting}
+            onClick={async () => {
+              setDeleting(true)
+              try {
+                await deleteAccount()
+                clear()
+                navigate('/')
+              } catch {
+                setDeleting(false)
+              }
+            }}
+            style={{
+              marginTop: spacing.md,
+              padding: `${spacing.sm} ${spacing.lg}`,
+              background: deleting ? colors.neutral[400] : colors.error[500],
+              color: colors.neutral[0],
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: typography.fontSize.sm,
+              fontWeight: typography.fontWeight.semibold,
+              cursor: deleting ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {deleting ? 'Deleting account...' : 'Delete my account'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
