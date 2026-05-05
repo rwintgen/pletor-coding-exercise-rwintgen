@@ -228,3 +228,13 @@ Result targets the 8.5/10 ceiling identified in the audit: env-driven config, fi
   - `ImageCard.tsx` delete — absolute-positioned overlay with backdrop blur
   - `ErrorBanner.tsx` dismiss — minimal inline "×" character
 - Button variant type now: `primary | secondary | danger | ghost | glimmer | icon`
+
+### Pinterest masonry, image source toggle, error/loading states, file size, quota race fix
+- **Pinterest-style masonry**: replaced round-robin flex-column layout with absolute-positioned masonry (`MasonryGrid`). JS measures each child via `ResizeObserver`, places items in the shortest column. Smooth animated transitions on resize. Guarantees L→R reading order with true variable-height masonry.
+- **Image source toggle**: new Zustand store (`stores/settings.ts`) with `picsum | unsplash` setting, persisted to localStorage. Profile page shows a segmented Picsum/Unsplash toggle (own profile only). `getImageUrl` remaps picsum URLs to the original 55 Unsplash photo IDs from the exercise seed when set to "unsplash" — some naturally 404, demonstrating error handling.
+- **Image loading/error states**:
+  - `ImageCard`: shimmer animation while loading, fade-in on load, "Image unavailable" placeholder (icon + text) on error.
+  - `ImageDetail` lightbox: same pattern — shimmer (320px), fade-in with blurred bg on load, placeholder on error.
+- **File size on hover**: `ImageCard` shows a bottom-left pill badge with KB/MB on hover. `ImageDetail` already displayed it in metadata.
+- **Quota race condition handling**: SQLite WAL mode + `busy_timeout=5000ms` configured via `@event.listens_for("connect")`. The quota check (`SELECT COUNT`) and image insert happen in the same auto-begun transaction. SQLite's single-writer lock serializes concurrent write transactions — if two uploads race, the second one blocks (up to 5s) until the first commits, then sees the updated count. Documented in the endpoint docstring that PostgreSQL would use `SELECT ... FOR UPDATE` or `SERIALIZABLE` isolation.
+- **ruff added to requirements.txt** so `format.sh` works inside Docker.

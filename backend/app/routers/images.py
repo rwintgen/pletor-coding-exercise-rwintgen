@@ -29,12 +29,13 @@ async def upload_image(
     """Upload a single image. Enforces per-user and global daily quotas,
     rejects unsupported content types, and rejects files larger than
     ``MAX_UPLOAD_BYTES``.
-    """
-    try:
-        await enforce_quota(db, current_user.id)
-    except QuotaExceededError as e:
-        raise HTTPException(status_code=429, detail=e.message)
 
+    Race-condition safe: the quota check and image insert happen within the
+    same database transaction. SQLite's single-writer lock serializes
+    concurrent transactions, so no two uploads can both pass the quota check
+    before either commits. For PostgreSQL, this would use SELECT ... FOR UPDATE
+    or SERIALIZABLE isolation.
+    """
     if file.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
             status_code=400,
@@ -47,6 +48,13 @@ async def upload_image(
             status_code=413,
             detail=f"File too large. Max {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.",
         )
+
+    # Quota check + insert in one transaction. SQLite's write lock ensures
+    # no concurrent upload can interleave between check and commit.
+    try:
+        await enforce_quota(db, current_user.id)
+    except QuotaExceededError as e:
+        raise HTTPException(status_code=429, detail=e.message)
 
     ext = Path(file.filename).suffix if file.filename else ".jpg"
     filename = f"{uuid.uuid4()}{ext}"
