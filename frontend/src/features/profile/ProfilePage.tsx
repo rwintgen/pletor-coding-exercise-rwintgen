@@ -15,6 +15,7 @@ import { Spinner } from '../../components/ui/Spinner'
 import { useDeleteImage, useUserImages } from '../../hooks/useImages'
 import { errorMessage } from '../../lib/errors'
 import { useAuthStore } from '../../stores/auth'
+import { type ImageSource, useSettingsStore } from '../../stores/settings'
 import { colors, gradients, radii, spacing, typography } from '../../theme'
 import { ImageDetail } from '../gallery/ImageDetail'
 import { UploadForm } from '../gallery/UploadForm'
@@ -175,6 +176,43 @@ export function ProfilePage() {
       {isOwnProfile && (
         <div
           style={{
+            marginTop: spacing['3xl'],
+            padding: spacing.xl,
+            background: colors.neutral[50],
+            borderRadius: radii.xl,
+            border: `1px solid ${colors.neutral[200]}`,
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: typography.fontSize.base,
+              fontWeight: typography.fontWeight.semibold,
+              color: colors.neutral[900],
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Settings
+          </h2>
+          <div
+            style={{
+              marginTop: spacing.md,
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing.lg,
+              fontSize: typography.fontSize.sm,
+              color: colors.neutral[600],
+            }}
+          >
+            <span>Image source:</span>
+            <ImageSourceToggle />
+          </div>
+        </div>
+      )}
+
+      {isOwnProfile && (
+        <div
+          style={{
             marginTop: spacing['4xl'],
             padding: spacing.xl,
             background: colors.error[50],
@@ -259,3 +297,34 @@ export function ProfilePage() {
   )
 }
 
+const SOURCE_OPTIONS: { value: ImageSource; label: string }[] = [
+  { value: 'picsum', label: 'Picsum' },
+  { value: 'unsplash', label: 'Unsplash' },
+]
+
+function ImageSourceToggle() {
+  const source = useSettingsStore((s) => s.imageSource)
+  const setSource = useSettingsStore((s) => s.setImageSource)
+
+  return (
+    <div style={{ display: 'flex', gap: 0, borderRadius: radii.lg, overflow: 'hidden', border: `1px solid ${colors.neutral[200]}` }}>
+      {SOURCE_OPTIONS.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => setSource(opt.value)}
+          style={{
+            padding: `${spacing.xs} ${spacing.lg}`,
+            fontSize: typography.fontSize.sm,
+            fontWeight: source === opt.value ? typography.fontWeight.semibold : typography.fontWeight.medium,
+            color: source === opt.value ? colors.neutral[0] : colors.neutral[700],
+            background: source === opt.value ? colors.primary[500] : colors.neutral[0],
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )
+}

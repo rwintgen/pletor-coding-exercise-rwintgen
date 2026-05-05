@@ -23,10 +23,16 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const [localTitle, setLocalTitle] = useState(image?.title ?? '')
+  const [imgErrored, setImgErrored] = useState(false)
+  const [imgLoaded, setImgLoaded] = useState(false)
 
   // Sync local title when the image prop changes (query refetch or different image)
   useEffect(() => {
-    if (image) setLocalTitle(image.title)
+    if (image) {
+      setLocalTitle(image.title)
+      setImgErrored(false)
+      setImgLoaded(false)
+    }
   }, [image])
 
   const goToProfile = () => {
@@ -46,30 +52,61 @@ export function ImageDetail({ image, onClose }: ImageDetailProps) {
               alignItems: 'center',
               justifyContent: 'center',
               overflow: 'hidden',
+              minHeight: imgLoaded || imgErrored ? undefined : 320,
+              background: imgLoaded || imgErrored ? undefined : `linear-gradient(110deg, ${colors.neutral[150]} 30%, ${colors.neutral[100]} 50%, ${colors.neutral[150]} 70%)`,
+              backgroundSize: '200% 100%',
+              animation: imgLoaded || imgErrored ? 'none' : 'shimmer 1.6s linear infinite',
             }}
           >
             {/* Blurred background fill — visible behind portrait/narrow images */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: -20,
-                backgroundImage: `url(${getImageUrl(image.url)})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                filter: 'blur(30px) brightness(0.6)',
-              }}
-            />
-            <img
-              src={getImageUrl(image.url)}
-              alt={image.title}
-              style={{
-                position: 'relative',
-                width: '100%',
-                maxHeight: '70vh',
-                objectFit: 'contain',
-                display: 'block',
-              }}
-            />
+            {!imgErrored && imgLoaded && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: -20,
+                  backgroundImage: `url(${getImageUrl(image.url)})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'blur(30px) brightness(0.6)',
+                }}
+              />
+            )}
+            {imgErrored ? (
+              <div
+                style={{
+                  width: '100%',
+                  height: 320,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: spacing.md,
+                  color: colors.neutral[400],
+                  background: colors.neutral[100],
+                }}
+              >
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span style={{ fontSize: typography.fontSize.sm }}>Image unavailable</span>
+              </div>
+            ) : (
+              <img
+                src={getImageUrl(image.url)}
+                alt={image.title}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgErrored(true)}
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxHeight: '70vh',
+                  objectFit: 'contain',
+                  display: 'block',
+                  opacity: imgLoaded ? 1 : 0,
+                  transition: `opacity 250ms ease`,
+                }}
+              />
+            )}
           </div>
           <div style={{ padding: spacing['2xl'] }}>
             {editing ? (

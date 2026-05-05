@@ -18,6 +18,7 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
   const navigate = useNavigate()
   const [hover, setHover] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [errored, setErrored] = useState(false)
 
   return (
     <Card interactive={!!onClick} onClick={onClick ? () => onClick(image) : undefined}>
@@ -39,15 +40,37 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
           alt={image.title}
           loading="lazy"
           onLoad={() => setLoaded(true)}
+          onError={() => { setErrored(true); setLoaded(true) }}
           style={{
             width: '100%',
             height: 'auto',
-            display: 'block',
+            display: errored ? 'none' : 'block',
             opacity: loaded ? 1 : 0,
             transform: hover ? 'scale(1.04)' : 'scale(1)',
             transition: `transform ${transitions.slow}, opacity ${transitions.normal}`,
           }}
         />
+        {errored && (
+          <div
+            style={{
+              width: '100%',
+              height: 180,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: spacing.sm,
+              color: colors.neutral[400],
+              fontSize: typography.fontSize.xs,
+              background: colors.neutral[100],
+            }}
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+            </svg>
+            <span>Image unavailable</span>
+          </div>
+        )}
         <div
           style={{
             position: 'absolute',
@@ -94,6 +117,28 @@ export function ImageCard({ image, onClick, onDelete }: ImageCardProps) {
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
+        )}
+        {hover && image.file_size && (
+          <span
+            style={{
+              position: 'absolute',
+              bottom: spacing.sm,
+              left: spacing.sm,
+              background: 'rgba(9,9,11,0.6)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+              color: '#fff',
+              fontSize: typography.fontSize.xs,
+              fontWeight: typography.fontWeight.medium,
+              padding: `2px ${spacing.sm}`,
+              borderRadius: radii.md,
+              pointerEvents: 'none',
+            }}
+          >
+            {image.file_size >= 1048576
+              ? `${(image.file_size / 1048576).toFixed(1)} MB`
+              : `${(image.file_size / 1024).toFixed(1)} KB`}
+          </span>
         )}
       </div>
 
